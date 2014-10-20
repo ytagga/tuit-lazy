@@ -7,5 +7,6 @@ configure
 config.status
 install-sh
 missing
+test-driver
 Makefile
 Makefile.in
