@@ -1,6 +1,6 @@
 --- tuit/lazy.t -*- mode: lua -*-
 
-plan(121)
+plan(121 + 10)
 
 m = eval[[require 'tuit.lazy']] or skip_all()
 f = require "tuit.combine"
@@ -12,6 +12,18 @@ is(a[1], 'a')
 is(a[2], 'b')
 is(a[3], 'c')
 is(a[4], nil)
+
+a = eval[[m.unfold_new(function (s) return s[#s] < 10 end, function (s) return s[#s - 1] + s[#s] end, {1, 1})]]
+isa(a, 'table')
+is(#a, 2)
+is(a[1], 1)
+is(a[2], 1)
+is(a[3], 2)
+is(a[4], 3)
+is(a[5], 5)
+is(a[6], 8)
+is(a[7], 13)
+is(a[8], nil)
 
 a = eval[[m.unfold(f.part(f.lt, 10), f.add, 1, 1)]]
 isa(a, 'table')

@@ -1,7 +1,7 @@
 --- tuit/array.lua - iteration over an array
 
 -------------------------------------------------------------------
--- Copyright (C) 2013 TAGA Yoshitaka <tagga@tsuda.ac.jp>
+-- Copyright (C) 2013-2014 TAGA Yoshitaka <tagga@tsuda.ac.jp>
 --
 -- Permission is hereby granted, free of charge, to any person
 -- obtaining a copy of this software and associated documentation
@@ -50,6 +50,20 @@ function M.ipairs(arr)
 	 return nil
    end)
 end
+
+function M.unfold_new(pred, f, seeds)
+   local v
+   M.bless(seeds)
+   while pred(seeds) do
+      v = f(seeds)
+      if v == nil then
+	 break
+      end
+      table.insert(seeds, v)
+   end
+   return seeds
+end
+
 
 function M.unfold(pred, proc, ...)
    local r = M.bless({})

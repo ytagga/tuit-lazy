@@ -53,6 +53,26 @@ function M.bless(from, tab, idxf)
    return tab
 end
 
+function M.unfold_new(pred, f, seeds)
+   local v
+   local f = function (t, n)
+		while pred(t) and #t < n do
+		   v = f(t)
+		   if v == nil then
+		      return nil
+		   end
+		   table.insert(t, v)
+		end
+		if #t == n then
+		   return v
+		else
+		   return nil
+		end
+	     end
+   return M.bless(M, seeds, f)
+end
+
+
 function M.unfold(pred, proc, ...)
    local seeds = {...}
    local r = { table.unpack(seeds) }
