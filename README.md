@@ -1,9 +1,9 @@
-tuit/lazy.lua and its related modules - array with lazy elements
-================================================================
+tuit/lazy.lua - iteration over a lazy-evaluated array
+=====================================================
 
-This package will provide the following modules:
+This package provides the following modules:
 
-* tuit.lazy - library arrays with lazy elements
-* tuit.array - library for normal arrays
+* tuit.lazy - iteration over a lazy-evaluated array
+* tuit.array - its parent class
 * tuit.list - list library
-* tuit.combine - library for functional programming
+* tuit.combine - functional programming library
