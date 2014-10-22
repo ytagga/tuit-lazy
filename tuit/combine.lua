@@ -29,8 +29,10 @@ tuit.combine = tuit.combine or {}
 
 --[[--
 
-NAME - tuit.combine
-===================
+NAME
+====
+
+tuit.combine - functions for functional programming
 
 SYNOPSIS
 ========
@@ -367,7 +369,7 @@ function M.call(f, ...) return f(...) end
 AUTHOR
 ======
 
-TAGA Yoshitaka <tagga@tsuda.ac.jp>
+TAGA Yoshitaka
 
 --]]--
 return M
