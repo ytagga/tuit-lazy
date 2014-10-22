@@ -57,11 +57,11 @@ function tap()
    for line in io.lines() do
       if string.match(line, "^%-%-%-tap") then
 	 sw = true
-      elseif not(string.match(line, "^%-%-")) then
+      elseif not(string.match(line, "^%-%- ")) then
 	 sw = false
       elseif sw then
 	 line = string.sub(line, 4)
-	 if string.match(line, "^%s*is") or string.match(line, "^%s*ok") then
+	 if string.match(line, "^%s*is") or string.match(line, "^%s*ok") or string.match(line, "^%s*(un)?like") then
 	    cnt = cnt + 1
 	 end
 	 table.insert(keep, line)

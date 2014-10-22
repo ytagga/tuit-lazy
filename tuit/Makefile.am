@@ -22,4 +22,8 @@ docfiles = combine.html
 
 doc : $(docfiles)
 
+
+.lua.t :
+	LUA_PATH="../aux/?.lua;;" $(LUA) -l scrape -e "tap()" < $? > $@
+
 # tuit/Makefil.am ends here
