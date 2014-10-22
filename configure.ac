@@ -14,7 +14,7 @@ AC_SUBST([LUA_VERSION])
 LUA_MODNAME=`echo $PACKAGE | tr - .`
 AC_SUBST(LUA_MODNAME)
 
-LUA_MODPATH=`echo $PACKAGE | tr / .`
+LUA_MODPATH=`echo $PACKAGE | tr - /`
 AC_SUBST(LUA_MODPATH)
 
 # Checks for libraries.
@@ -25,5 +25,5 @@ AC_SUBST(LUA_MODPATH)
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile tuit/Makefile rockspec])
+AC_CONFIG_FILES([Makefile tuit/Makefile])
 AC_OUTPUT

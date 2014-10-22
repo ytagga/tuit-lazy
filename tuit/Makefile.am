@@ -15,10 +15,11 @@ AM_T_LOG_FLAGS = -l tap
 EXTRA_DIST = $(TESTS)
 
 MARKDOWN = $(HOME)/bin/markdown.lua
-docdir = 
-doc_DATA = combine.html
+docfiles = combine.html
 
 .lua.html :
-	$(LUA) ../aux/cut.lua < $? | $(MARKDOWN) > $@
+	LUA_PATH="../aux/?.lua;;" $(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@
+
+doc : $(docfiles)
 
 # tuit/Makefil.am ends here
