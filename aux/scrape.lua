@@ -33,7 +33,6 @@ NAME scrape.lua
 --]]--
 function doc()
    local sw = false
-   local line
 
    for line in io.lines() do
       if string.match(line, "^%-%-%[%[%-%-") then
@@ -50,7 +49,6 @@ end
 --]]--
 function tap()
    local sw = false
-   local line
    local keep = {}
    local cnt = 0
 

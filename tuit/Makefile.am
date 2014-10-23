@@ -15,7 +15,7 @@ AM_T_LOG_FLAGS = -l tap
 EXTRA_DIST = $(TESTS)
 
 MARKDOWN = $(HOME)/bin/markdown.lua
-docfiles = combine.html
+docfiles = combine.html list.html
 
 .lua.html :
 	LUA_PATH="../aux/?.lua;;" $(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@

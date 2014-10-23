@@ -136,8 +136,13 @@ end
 predicates
 ----------
 
+* `m.equal(x, y)` - returns `true` if and only if `a` and `b` are recursively
+equivalent.
 --]]--
-
+---tap
+-- ok(m.equal(1, 1))
+-- ok(m.equal({{1, 2}, {3}}, {{1, 2}, {3}}))
+-- ok(m.equal({0, {1, 2}}, {0, {1, 2}}))
 function M.equal(a, b)
    if type(a) ~= 'table' or type(b) ~= 'table' then
       return a == b
@@ -152,21 +157,14 @@ function M.equal(a, b)
       return true
    end
 end
-
-
-
-function M.append(...)
-   local r = {}
-   for _, v in ipairs{...} do
-      for _, w in ipairs(v) do
-	 table.insert(r, w)
-      end
-   end
-   return r
-end
-
-
-
+--[[--
+* `m.list_eq(eq, x, ...)` - 
+--]]--
+---tap
+-- g = function (a, b) return a == b end
+-- ok(m.list_eq(g))
+-- ok(m.list_eq(g, {1}))
+-- ok(m.list_eq(g, {1, 2}, {1, 2}, {1, 2}))
 
 local function list_eq2(eq, a, b)
    if #a ~= #b then
@@ -179,14 +177,29 @@ local function list_eq2(eq, a, b)
    end
    return true
 end
-
-function M.list_eq(eq, x, ...)
-   for _, v in ipairs{...} do
-      if not list_eq2(eq, x, v) then
+function M.list_eq(eq, ...)
+   local x = {...}
+   for i = 2, #x do
+      if not list_eq2(eq, x[i-1], x[i]) then
 	 return false
       end
    end
    return true
+end
+
+--[[--
+
+selectors
+---------
+
+function M.append(...)
+   local r = {}
+   for _, v in ipairs{...} do
+      for _, w in ipairs(v) do
+	 table.insert(r, w)
+      end
+   end
+   return r
 end
 
 function M.zip(...)

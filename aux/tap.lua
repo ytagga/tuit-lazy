@@ -159,7 +159,6 @@ local function cv_deeply(x, y)
    elseif type(y) ~= "table" then
       return false
    else
-      local k, v
       for k, v in pairs(x) do
 	 if not(cv_deeply(v, y[k])) then
 	    return false

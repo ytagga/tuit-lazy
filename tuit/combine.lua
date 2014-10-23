@@ -149,6 +149,7 @@ end
 -- is(g2(1), 1)
 function M.memoize(f)
    local d = {}
+   setmetatable(d, {__mode = "kv"})
    return function (...)
 	     local s = {...}
 	     local k = table.concat(s, ';')
