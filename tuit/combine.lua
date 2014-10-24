@@ -37,8 +37,8 @@ tuit.combine - functions for functional programming
 SYNOPSIS
 ========
 
-    m = require "tuit.combine"
-    print(m.fix(function () return m.const(9) end)(3)) -- 9
+     m = require "tuit.combine"
+     print(m.fix(function () return m.const(9) end)(3)) -- 9
 
 DESCRIPTION
 ===========
