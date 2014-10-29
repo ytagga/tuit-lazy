@@ -67,36 +67,6 @@ function M.list(...)
 end
 
 --[[--
-* `m.make_list(n, [fill])` - returns an `n`-element list,
-whose elements are all the value `fill`.
-If the `fill` argument is not given,
-the elements of the list may be arbitrary values, but may not be `nil`.
---]]--
----tap
--- is_deeply(m.make_list(3, 'a'), {'a', 'a', 'a'})
-function M.make_list(n, fill)
-   fill = fill or true
-   local r = {}
-   for i = 1, n do
-      table.insert(r, fill)
-   end
-   return r
-end
---[[--
-* `m.list_tabulate(n, proc)` - returns an `n`-element list.
-Element `i` of the list, where `1 < i <= n`, is produced by `proc(i)`.
---]]--
----tap
--- g = function (i) return 2 * i end
--- is_deeply(m.list_tabulate(3, g), {2, 4, 6})
-function M.list_tabulate(n, proc)
-   local r = {}
-   for i = 1, n do
-      table.insert(r, proc(i))
-   end
-   return r
-end
---[[--
 * `m.list_copy(list)` - copies the spine of the argument.
 --]]--
 ---tap
@@ -106,27 +76,93 @@ end
 function M.list_copy(a)
    return {table.unpack(a)}
 end
+
 --[[--
-* `m.iota(n, [init, step])` - returns a list of
-`{init, init + step, ..., init + (n - 1) * step}`.
+* `m.unfold(null, kar, kdr, seed, [head])` - is a generic recursive
+constructor.  If `kar` never returns `nil`, this is equivalent to
+the following funtion:
+
+       function m.unfold(null, kar, kdr, seed, head)
+         if null(seed) then
+           return head
+         else
+           table.insert(head, kar(seed))
+           return m.unfold(null, kar, kdr, kdr(seed), head)
+         end
+       end
+
+The actual implementation ends the list if `null(seed)` is true
+or if `kar(seed)` returns `nil`. If `head` is omitted, `{}` is used
+instead.
 --]]--
 ---tap
--- is_deeply(m.iota(3), {0, 1, 2})
--- is_deeply(m.iota(3, 1), {1, 2, 3})
--- is_deeply(m.iota(3, 1, 2), {1, 3, 5})
-function M.iota(n, init, step)
-   init = init or 0
-   step = step or 1
-   local k = init
-   local r = {}
-   for i = 1, n do
-      r[i] = k
-      k = k + step
+-- y = {1, 1}
+-- is_deeply(m.unfold(function (x) return #x >= 5 end,
+--                    function (x) return x[#x-1] + x[#x] end,
+--                    function (x) return x end,
+--                    y, y), {1, 1, 2, 3, 5})
+function M.unfold(null, kar, kdr, seed, head)
+   head = head or {}
+   local v
+   while not(null(seed)) do
+      v = kar(seed)
+      if v == nil then
+	 break
+      end
+      table.insert(head, v)
+      seed = kdr(seed)
+   end
+   return head
+end
+
+--[[--
+
+`fold` and other acumulator functions
+-------------------------------------
+
+--]]--
+---tap
+-- is(m.fold(function (x, y) return x + y end, 0, {1, 2, 3}), 6)
+function M.fold(proc, init, lst)
+   local r = init
+   for _, v in ipairs(lst) do
+      r = proc(r, v)
+   end
+   return r
+end
+
+---tap
+-- is(m.fold_right(function (x, y) return x + y end, 0, {1, 2, 3}), 6)
+
+function M.fold_right(proc, init, lst)
+   local r = init
+   for i = #lst, 1, -1 do
+      r = proc(lst[i], r)
+   end
+   return r
+end
+
+
+-- is(m.reduce(function (x, y) return x + y end, {1, 2, 3}), 6)
+function M.reduce(proc, lst)
+   local r = lst[1]
+   for i = 2, #lst do
+      r = proc(r, lst[i])
+   end
+   return r
+end
+
+-- is(m.reduce_right(function (x, y) return x + y end, {1, 2, 3}), 6)
+function M.reduce_right(proc, lst)
+   local r = lst[#lst]
+   for i = #lst - 1, 1, -1 do
+      r = proc(lst[i], r)
    end
    return r
 end
 
 --[[--
+
 
 predicates
 ----------
@@ -152,35 +188,6 @@ function M.equal(a, b)
       return true
    end
 end
---[[--
-* `m.list_eq(eq, x, ...)` - determines list equality with `eq` predicate procedure.
---]]--
----tap
--- g = function (a, b) return a == b end
--- ok(m.list_eq(g))
--- ok(m.list_eq(g, {1}))
--- ok(m.list_eq(g, {1, 2}, {1, 2}, {1, 2}))
-
-local function list_eq2(eq, a, b)
-   if #a ~= #b then
-      return false
-   end
-   for i = 1, #a do
-      if not(eq(a[i], b[i])) then
-	 return false
-      end
-   end
-   return true
-end
-function M.list_eq(eq, ...)
-   local x = {...}
-   for i = 2, #x do
-      if not list_eq2(eq, x[i-1], x[i]) then
-	 return false
-      end
-   end
-   return true
-end
 
 --[[--
 
@@ -200,119 +207,18 @@ function M.take(lst, i)
 end
 
 --[[--
-* `m.drop(lst, i)` - returns a list of all but the first `i` elements of list `lst`.
---]]--
----tap
--- is_deeply(m.drop({1, 2, 3}, 2), {3})
-function M.drop(lst, i)
-   local r = {}
-   for k = i + 1, #lst do
-      table.insert(r, lst[k])
-   end
-   return r
-end
---[[--
-* `m.take_right(lst, i)` - returns a list of the last `i` elements of list `lst`.
---]]--
----tap
--- is_deeply(m.take_right({1, 2, 3}, 2), {2, 3})
-function M.take_right(lst, i)
-   local r = {}
-   for k = #lst - i + 1, #lst do
-      table.insert(r, lst[k])
-   end
-   return r
-end
---[[--
-* `m.drop_right(lst, i)` - returns a list of all but the last `i` elements of list `lst`.
---]]--
---tap
--- is_deeply(m.drop_right({1, 2, 3}, 2), {1})
-function M.drop_right(lst, i)
-   local r = {}
-   for k = 1, #lst - i do
-      table.insert(r, lst[k])
-   end
-   return r
-end
---[[--
-* `m.take_q(lst, i)` - removes all but the first `i` elements from list `lst`.
+* `m.drop(lst, i)`  - removes the first `i` elements from list `lst`.
 --]]--
 ---tap
 -- x = {1, 2, 3}
--- y = m.take_q(x, 2)
--- is_deeply(y, {1, 2})
--- is(y, x)
-function M.take_q(lst, i)
-   for k = i + 1, #lst do
-      lst[k] = nil
-   end
-   return lst
-end
---[[--
-* `m.take_right_q(lst, i)` - removes all but the last `i` elements from list `lst`.
---]]--
----tap
--- x = {1, 2, 3}
--- y = m.take_right_q(x, 2)
--- is_deeply(y, {2, 3})
--- is(y, x)
-function M.take_right_q(lst, i)
-   for k = i + 1, #lst do
-      table.remove(lst, 1)
-   end
-   return lst
-end
---[[--
-* `m.drop_q(lst, i)`  - removes the first `i` elements from list `lst`.
---]]--
----tap
--- x = {1, 2, 3}
--- y = m.drop_q(x, 2)
+-- y = m.drop(x, 2)
 -- is_deeply(y, {3})
 -- is(y, x)
-function M.drop_q(lst, i)
+function M.drop(lst, i)
    for k = 1, i do
       table.remove(lst, 1)
    end
    return lst
-end
---[[--
-* `m.drop_right_q(lst, i)` - removes the last `i` elements from lst `lst`.
---]]--
----tap
--- x = {1, 2, 3}
--- y = m.drop_right_q(x, 2)
--- is_deeply(y, {1})
--- is(y, x)
-function M.drop_right_q(lst, i)
-   for k = #lst - i + 1, #lst do
-      lst[k] = nil
-   end
-   return lst
-end
-
---[[--
-* `m.split_at(lst, i)` - returns m.take(lst, i) and m.drop(lst, i)
---]]--
----tap
--- x, y = m.split_at({1, 2, 3}, 2)
--- is_deeply(x, {1, 2})
--- is_deeply(y, {3})
-function M.split_at(lst, i)
-   return M.take(lst, i), M.drop(lst, i)
-end
---[[--
-* `m.split_at_q(lst, i)` - returns m.take(lst, i) and m.drop_q(lst, i)
---]]--
----tap
--- z = {1, 2, 3}
--- x, y = m.split_at_q(z, 2)
--- is_deeply(x, {1, 2})
--- is_deeply(y, {3})
--- is(y, z)
-function M.split_at_q(lst, i)
-   return M.take(lst, i), M.drop_q(lst, i)
 end
 --[[--
 * `m.last(lst)` - return the last element of list `lst`.
@@ -397,23 +303,16 @@ function M.concatinate_q(lst)
    return M.append_q(table.unpack(lst))
 end
 --[[--
-* `m.reverse(lst)` - returns a newly allocated list consisting of the elements of `lst` in reverse order.
+* `m.reverse(lst)` - reverses the order of list `lst`.
 --]]--
 ---tap
 -- is_deeply(m.reverse({1, 2, 3}), {3, 2, 1})
 -- is_deeply(m.reverse({1, 2, 3, 4}), {4, 3, 2, 1})
-function M.reverse(lst)
-   return M.reverse_q({table.unpack(lst)})
-end
---[[--
-* `m.reverse_q(lst)` - reverses the order of list `lst`.
---]]--
----tap
 -- x = {1, 2, 3}
--- y = m.reverse_q(x)
+-- y = m.reverse(x)
 -- is_deeply(y, {3, 2, 1})
 -- is(y, x)
-function M.reverse_q(r)
+function M.reverse(r)
    local k
    for i = 1, #r / 2 do
       k = #r - i + 1
@@ -422,47 +321,193 @@ function M.reverse_q(r)
    return r
 end
 --[[--
-* `m.append_reverse(rev_head, tail)`
-* `m.append_reverse_q(rev_head, tail)`
-* `m.zip(lst1, lst2, ...)`
+* `m.zip(lst1, lst2, ...)` - With `n` lists, it returns a list
+as long as the shortest of these lists,
+each element of which is an `n`-element list comprised of
+the corresponding elements from the parameter lists.
 --]]--
-function M.zip(...)
-   local all = {...}
-   local r = {}
+---tap
+-- is_deeply(m.zip({1, 2, 3}, {4, 5, 6}), {{1, 4}, {2, 5}, {3, 6}})
+local function minlen(all)
    local n = math.huge
    local x
-   for j, v in ipairs(all) do
+   for _, v in ipairs(all) do
       x = #v
       if x < n then
 	 n = x
       end
    end
+   if n == math.huge then
+      n = 0
+   end
+   return n
+end
+function M.zip(...)
+   local all = {...}
+   local r = {}
+   local n = minlen(all)
+   local x
    for i = 1, n do
-      r[i] = {}
+      x = {}
+      r[i] = x
       for j, v in ipairs(all) do
-	 r[i][j] = v[i]
+	 x[j] = v[i]
       end
    end
    return r
 end
---[[--
-* `m.unzip1(lst)`
-* `m.unzip2(lst)`
-* `m.unzip3(lst)`
-* `m.unzip4(lst)`
-* `m.unzip5(lst)`
 
-fold, unfold, & map
+--[[--
+
+map
+---
+
+* `m.map(proc, lst1, lst2, ...)` - applies `proc` element-wise to the elements of the lists and returns a list of the results, in order. 
+--]]--
+---tap
+-- is_deeply(m.map(function (x, y, z) return x + y - z end, {1, 2}, {3, 4}, {5, 6}), {-1, 0})
+function M.map(proc, ...)
+   local r = {}
+   for _, v in ipairs(M.zip(...)) do
+      table.insert(r, proc(table.unpack(v)))
+   end
+   return r
+end
+
+--[[--
+
+filtering and searching
 -----------------------
 
-* `m.fold(kons, knil, lst1, lst2, ...)`
-* `m.fold_right(kons, knil, lst1, lst2, ...)`
-* `m.reduce(f, ridentity, lst)`
-* `m.unfold(pred, kar, kdr, seed, [tail_gen])`
-* `m.unfold_right(pred, kar, kdr, seed, [tail_gen])`
-* `m.map(proc, lst1, lst2, ...)`
+* `m.filter(pred, lst)` - returns a list of the elements of `lst` that satisfy predicate `pred`.
+--]]--
+---tap
+-- is_deeply(m.filter(function (x) return x % 2 == 0 end, {1, 2, 3, 4}), {2, 4})
+function M.filter(pred, lst)
+   local r = {}
+   for _, v in ipairs(lst) do
+      if pred(v) then
+	 table.insert(r, v)
+      end
+   end
+   return r
+end
+
+--[[--
+
+* `m.find(pred_or_elt, lst)` - returns the index and the value of the first element of list `lst` that is equivalent or satisfies the first argument.
 
 --]]--
+---tap
+-- function g(x) return x == 3 end
+-- x, y = m.find(g, {1, 3, 5})
+-- is(x, 2)
+-- is(y, 3)
+-- x, y = m.find(g, {1, 7, 5})
+-- is(x, false)
+-- is(y, nil)
+--]]--
+function M.find(x, lst)
+   local pred
+   if type(x) == 'function' then
+      pred = x
+   else
+      pred = function (y) return x == y end
+   end
+
+   for i, v in ipairs(lst) do
+      if pred(v) then
+	 return i, v
+      end
+   end
+   return false
+end
+
+--[[--
+
+* `m.erase(pred_or_elt, lst)` - deletes all the elements in list `lst` that are equivalent to or satisfy the first argument.
+
+--]]--
+function M.erase(x, lst)
+   local pred
+   if type(x) == 'function' then
+      pred = x
+   else
+      pred = function (y) return y == x end
+   end
+   local i = 1
+   while i <= #lst do
+      if pred(lst[i]) then
+	 table.remove(lst, i)
+      else
+	 i = i + 1
+      end
+   end
+   return lst
+end
+
+--[[--
+* `m.take_while(pred, lst)`
+--]]--
+---tap
+-- is_deeply(m.take_while(function (x) return x < 3 end, {1, 3, 5}), {1})
+function M.take_while(pred, lst)
+   local r = {}
+   for _, v in ipairs(lst) do
+      if not(pred(v)) then
+	 break
+      end
+      table.insert(r, v)
+   end
+   return r
+end
+
+
+
+--[[--
+* `m.drop_while(pred, lst)`
+--]]--
+---tap
+-- is_deeply(m.drop_while(function (x) return x <= 3 end, {1, 3, 5}), {5})
+
+function M.drop_while(pred, lst)
+   while #lst > 0 and pred(lst[1]) do
+      table.remove(lst, 1)
+   end
+   return lst
+end
+
+
+--[[--
+* `m.any(pred, lst1, ...)`
+--]]--
+---tap
+-- is(m.any(function (x) return x == 2 end, {1, 2, 3}), true)
+-- is(m.any(function (x) return x == 2 end, {1, 3, 5}), false)
+function M.any(pred, ...)
+   for _, v in ipairs(M.zip(...)) do
+      if M.apply(pred, v) then
+	 return true
+      end
+   end
+   return false
+end
+--[[--
+* `m.every(pred, lst1, ...)`
+--]]--
+---tap
+-- is(m.every(function (x) return x == 2 end, {2, 2, 2}), true)
+-- is(m.every(function (x) return x == 2 end, {2, 1, 2}), false)
+function M.every(pred, ...)
+   for _, v in ipairs(M.zip(...)) do
+      if not(M.apply(pred, v)) then
+	 return false
+      end
+   end
+   return true
+end
+
+
 local function flat(x, r)
    if type(x) == 'table' then
       for i, v in ipairs(x) do

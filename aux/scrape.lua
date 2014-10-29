@@ -67,11 +67,15 @@ function tap()
    end
    if cnt > 0 then
       print("--- tap script - -*- mode:lua -*-")
+      print("_ = function ()")
       print("plan(" .. cnt .. ")")
       for _, line in ipairs(keep) do
 	 print(line)
       end
       print("summary()")
+      print("end")
+      print("f, v = pcall(_)")
+      print("if not(f) then bail_out(v) end")
    end
 end
 --- scrape.lua ends here

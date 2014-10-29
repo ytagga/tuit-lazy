@@ -1,4 +1,5 @@
 --- tap script - -*- mode:lua -*-
+_ = function ()
 plan(49)
 m = eval[[require 'tuit.combine']] or skip_all()
 g1 = function (x) return x + 3 end
@@ -64,3 +65,6 @@ is(m.index(a, 4), a[4])
 g = function (x, y) return x .. ":" .. y end
 is(m.call(g, 'a', 'b'), g('a', 'b'))
 summary()
+end
+f, v = pcall(_)
+if not(f) then bail_out(v) end
