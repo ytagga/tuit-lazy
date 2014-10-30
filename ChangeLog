@@ -1,3 +1,7 @@
+2014-10-30  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* tuit/list.lua: Rewritten
+
 2014-10-29  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* tuit/list.lua: Making functions more Lua-ish
