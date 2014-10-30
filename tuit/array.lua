@@ -32,76 +32,91 @@ local MT = { __index = M }
 
 table.unpack = table.unpack or unpack
 
+--[[--
+
+NAME
+====
+
+tuit.array - linear list library
+
+SYNOPSIS
+========
+
+     m = require "tuit.array"
+
+DESCRIPTION
+===========
+
+This module provides linear list functions.
+Some have a similar one in tuit.list' module,
+but the order of the arguments may be different.
+The first argument of most functions are a list.
+
+objectifier and constructors
+----------------------------
+
+--]]--
+---tap
+-- m = eval[[require 'tuit.array']] or skip_all()
+
+--[[--
+* `m.bless(arr)` - tells list `arr` that it should work as `tuit.array` object.
+--]]--
+---tap
+-- is(m.bless{'a', 'b', 'c'}:count(function(x) return true end), 3)
 function M.bless(arr)
+   arr = arr or {}
    setmetatable(arr, MT)
    return arr
+end
+
+--[[--
+* `head:unfold([null], kar, [kdr, seed]) - is a generic recursive constructor.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 1}:unfold(
+--             function (x) return #x >= 5 end,
+--             function (x) return x[#x] + x[#x-1] end,
+--             function (x) return x end),
+--             {1, 1, 2, 3, 5})
+-- is_deeply(m.bless():unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
+function M.unfold(head, pred, kar, kdr, seed)
+   seed = seed or head
+   kdr = kdr or function (x) return x end
+   if kar == nil then
+      kar = pred
+      pred = function (x) return false end
+   end
+   local v
+   while not(pred(seed)) do
+      v = kar(seed)
+      if v == nil then
+	 break
+      end
+      table.insert(head, v)
+   end
+   return head
 end
 
 function M.ipairs(arr)
    return coroutine.wrap(
       function ()
-	 local i = 1
-	 local v = arr[i]
-	 while v ~= nil do
-	    coroutine.yield(i, v)
+	 local i = 0
+	 local v
+	 while true do
 	    i = i + 1
 	    v = arr[i]
+	    if v == nil then
+	       break
+	    end
+	    coroutine.yield(i, v)
 	 end
 	 return nil
    end)
 end
 
-function M.unfold_new(pred, f, seeds)
-   local v
-   M.bless(seeds)
-   while pred(seeds) do
-      v = f(seeds)
-      if v == nil then
-	 break
-      end
-      table.insert(seeds, v)
-   end
-   return seeds
-end
+MT.__ipairs = function (arr) return M.ipairs(arr), arr, 0 end
 
-
-function M.unfold(pred, proc, ...)
-   local r = M.bless({})
-   local v
-   local seeds = {...}
-   for _, v in ipairs(seeds) do
-      table.insert(r, v)
-   end
-   while true do
-      v = proc(table.unpack(seeds))
-      if v == nil or pred(v) then
-	 break
-      end
-      table.insert(r, v)
-      table.remove(seeds, 1)
-      table.insert(seeds, v)
-   end
-   return r
-end
-
-local function no(x)
-   return false
-end
-function M.qw(str)
-   return M.unfold(no, string.gmatch(str, "(%S+)"))
-end
-
-function M.dispatch(any)
-   if type(any) == "table" then
-      return M.bless(any)
-   elseif type(any) == "string" then
-      return M.qw(any)
-   elseif type(any) == "function" then
-      return M.unfold(any)
-   else
-      return M.bless({ any })
-   end
-end
 
 function M.iota(cnt, init, step)
    init = init or 0
@@ -164,10 +179,17 @@ function M.count(arr, pred)
    return r
 end
 
-function M.find(arr, pred)
-   for _, v in M.ipairs(arr) do
+
+function M.find(arr, x)
+   local pred
+   if type(x) == 'function' then
+      pred = x
+   else
+      pred = function (y) return x == y end
+   end
+   for i, v in M.ipairs(arr) do
       if pred(v) then
-	 return v
+	 return i
       end
    end
    return nil
