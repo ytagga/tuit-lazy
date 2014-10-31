@@ -37,7 +37,7 @@ table.unpack = table.unpack or unpack
 NAME
 ====
 
-tuit.array - linear list library
+tuit.array - iteration over a linear table
 
 SYNOPSIS
 ========
@@ -72,6 +72,8 @@ end
 
 --[[--
 * `head:unfold([null], kar, [kdr, seed]) - is a generic recursive constructor.
+The default values of `seed` is `head`, that of `kdr` is the identity function,
+and that of `null` is a constant function that returns `false`.
 --]]--
 ---tap
 -- is_deeply(m.bless{1, 1}:unfold(
@@ -88,14 +90,47 @@ function M.unfold(head, pred, kar, kdr, seed)
       pred = function (x) return false end
    end
    local v
+   local i = #head
    while not(pred(seed)) do
       v = kar(seed)
       if v == nil then
 	 break
       end
-      table.insert(head, v)
+      i = i + 1
+      head[i] = v
+      seed = kdr(seed)
    end
    return head
+end
+--[[--
+* head:range(init, finish, [step]) - 
+--]]--
+---tap
+-- is_deeply(m.bless():range(1, 5), {1, 2, 3, 4, 5})
+-- is_deeply(m.bless():range(4, 1), {4, 3, 2, 1})
+-- is_deeply(m.bless():range(4, 1, -2), {4, 2})
+function M.range(head, init, finish, step)
+   step = step or 1
+   if init > finish then
+      if step > 0 then
+	 step = - step
+      end
+   else
+      if step < 0 then
+	 step = - step
+      end
+   end
+   return M.unfold(head,
+		   function (x)
+		      if step > 0 then
+			 return x > finish
+		      else
+			 return x < finish
+		      end
+		   end,
+		   function (x) return x end,
+		   function (x) return x + step end,
+		   init)
 end
 
 function M.ipairs(arr)
@@ -117,18 +152,6 @@ end
 
 MT.__ipairs = function (arr) return M.ipairs(arr), arr, 0 end
 
-
-function M.iota(cnt, init, step)
-   init = init or 0
-   step = step or 1
-   local r = M.bless({})
-   local v = init
-   for i = 1, cnt do
-      r[i] = v
-      v = v + step
-   end
-   return r
-end
 
 function M.copy(arr)
    local r = M.bless({})

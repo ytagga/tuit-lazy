@@ -211,6 +211,42 @@ function M.filter(pred, lst)
 end
 
 --[[--
+* `m.each(proc, lst1, ...)` - calls procedure `proc` with the elements of the lists in order.
+--]]--
+---tap
+-- x = ''
+-- m.each(function (p, q) x = x .. p .. q end, {1, 2, 3}, {'a', 'b', 'c'})
+-- is(x, "1a2b3c")
+function M.each(proc, ...)
+   for i, v in ipairs(M.zip(...)) do
+      proc(table.unpack(v))
+   end
+end
+--[[--
+* `m.each_ipair(proc, lst)` - calls procedure `proc` with an index and its value of list `lst` in order.
+--]]--
+---tap
+-- x = ''
+-- m.each_ipair(function (p, q) x = x .. p .. q end, {'a', 'b', 'c'})
+-- is(x, "1a2b3c")
+function M.each_ipair(proc, lst)
+   for i, v in ipairs(lst) do
+      proc(i, v)
+   end
+end
+--[[--
+* `m.each_pair(proc, tab)` - calls procedure `proc` with a key and its value of table `tab`.
+--]]--
+x = {}
+-- m.each_pair(function (p, q) x[q] = p end, {['a'] = 1, ['b'] = 2, ['c'] = 3})
+-- is_deeply(x, {'a', 'b', 'c'})
+
+function M.each_pair(proc, tab)
+   for k, v in pairs(tab) do
+      proc(k, v)
+   end
+end
+--[[--
 * `m.find(pred_or_elt, lst)` - returns the index and the value of the first element of list `lst` that is equivalent to or satisfies the first argument.
 --]]--
 ---tap

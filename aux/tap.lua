@@ -100,6 +100,28 @@ end
 local function cv_ok(x, y)
    return x
 end
+
+local function pretty(x)
+   local typ = type(x)
+   if typ == 'table' then
+      local r = '{'
+      for i, v in ipairs(x) do
+	 if i ~= 1 then
+	    r = r .. ', '
+	 end
+	 r = r .. pretty(v)
+      end
+      return r .. '}'
+   elseif typ == 'string' then
+      return '"' .. x .. '"'
+   elseif typ == 'function' then
+      return "function"
+   else
+      return x
+   end
+end
+
+
 local function check(expr, val, msg, cv)
    M.cnt = M.cnt + 1
    if M.skip then
@@ -125,9 +147,9 @@ local function check(expr, val, msg, cv)
 	    print("not ok " .. M.cnt)
 	 end
 	 if cv == cv_ok then
-	    print("# got:", expr)
+	    print("# got:", pretty(expr))
 	 else
-	    print("# got:", expr, "but expected:", val)
+	    print("# got:", pretty(expr), "but expected:", pretty(val))
 	 end
       end
    end
