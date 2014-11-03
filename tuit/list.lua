@@ -183,7 +183,7 @@ end
 map, filter, and selectors
 --------------------------
 
-* `m.map(proc, lst1, lst2, ...)` - applies `proc` element-wise to the elements of the lists and returns a list of the results, in order.
+* `m.map(proc, lst1, lst2, ...)` - applies `proc` element-wise to the elements of the lists in order and returns a list of the results.
 --]]--
 ---tap
 -- is_deeply(m.map(function (x, y, z) return x + y - z end, {1, 2}, {3, 4}, {5, 6}), {-1, 0})
@@ -257,7 +257,6 @@ end
 -- x, y = m.find(g, {1, 7, 5})
 -- is(x, false)
 -- is(y, nil)
---]]--
 function M.find(x, lst)
    local pred
    if type(x) == 'function' then

@@ -133,6 +133,15 @@ function M.range(head, init, finish, step)
 		   init)
 end
 
+--[[--
+
+iterator and accumulator
+------------------------
+
+* `arr:ipairs()` - will be used in construction `for`. In Lua 5.2,  this
+function is used in the metamethod for the original `ipairs` function.
+
+--]]--
 function M.ipairs(arr)
    return coroutine.wrap(
       function ()
@@ -152,15 +161,109 @@ end
 
 MT.__ipairs = function (arr) return M.ipairs(arr), arr, 0 end
 
-
-function M.copy(arr)
-   local r = M.bless({})
-   for i, v in M.ipairs(arr) do
-      r[i] = v
+--[[--
+* `arr:fold(proc, left_id)` - iterates procedure `proc` over an acumulator value and the elements of `arr` from left to right, starting with an acumulator value `init`. If `lst` is empty, it returns `init`.
+--]]--
+---tap
+-- is(m.bless{'a', 'b', 'c'}:fold(function (r, x) return r .. x end, 'X'), 'Xabc')
+function M.fold(arr, kons, knil)
+   local r = knil
+   for _, v in M.ipairs(arr) do
+      r = kons(r, v)
    end
    return r
 end
 
+--[[--
+
+map, filter and selectors
+-------------------------
+
+* `arr:map(proc)` - applies `proc` element-wise to the elements of `arr` in order and returns a list of the results.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 2, 3}:map(function (x) return x + 1 end), {2, 3, 4})
+function M.map(arr, proc)
+   local r = M.bless({})
+   for i, v in M.ipairs(arr) do
+      r[i] = proc(v)
+   end
+   return r
+end
+
+--[[--
+* `arr:filter(pred)` - returns a list of the elements of `arr` that satisfy predicate `pred`.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 2, 3}:filter(function (x) return x % 2 == 0 end), {2})
+-- is_deeply(m.bless{1, 2, 3}:filter(function (x) return x % 2 ~= 0 end), {1, 3})
+function M.filter(arr, pred)
+   local r = M.bless({})
+   local j = 1
+   for _, v in M.ipairs(arr) do
+      if pred(v) then
+	 r[j] = v
+	 j = j + 1
+      end
+   end
+   return r
+end
+
+--[[--
+* `arr:each(proc)` - calls procedure `proc` with the elements of `arr` in order.
+--]]--
+---tap
+-- x = ''
+-- m.bless{1, 2, 3}:each(function (y) x = x .. y end)
+-- is(x, '123')
+function M.each(arr, proc)
+   for _, v in M.ipairs(arr) do
+      proc(v)
+   end
+end
+--[[--
+* `arr:each_ipairs(proc)` - calls procedure `proc` with an index and its value of `arr` in order.
+--]]--
+---tap
+-- x = ''
+-- m.bless{'a', 'b', 'c'}:each_ipair(function (i, v) x = x .. i .. v end)
+-- is(x, '1a2b3c')
+function M.each_ipair(arr, proc)
+   for i, v in M.ipairs(arr) do
+      proc(i, v)
+   end
+end
+--[[--
+* `arr:find(pred_or_elt)` - returns the index and the value of the first element of `arr` that is equivalent to or satisfies the first argument.
+--]]--
+---tap
+-- function g(x) return x == 3 end
+-- x, y = m.bless{1, 3, 5}:find(g)
+-- is(x, 2)
+-- is(y, 3)
+-- x, y = m.bless{1, 7, 5}:find(g)
+-- is(x, false)
+-- is(y, nil)
+function M.find(arr, x)
+   local pred
+   if type(x) == 'function' then
+      pred = x
+   else
+      pred = function (y) return x == y end
+   end
+   for i, v in M.ipairs(arr) do
+      if pred(v) then
+	 return i, v
+      end
+   end
+   return false
+end
+--[[--
+* `arr:take(n)` - returns an array of the first `n` elements of `arr`.
+--]]--
+---tap
+---tap
+-- is_deeply(m.bless{1, 2, 3}:take(2), {1, 2})
 function M.take(arr, n)
    local r = M.bless({})
    for i, v in M.ipairs(arr) do
@@ -171,6 +274,16 @@ function M.take(arr, n)
    end
    return r
 end
+
+
+function M.copy(arr)
+   local r = M.bless({})
+   for i, v in M.ipairs(arr) do
+      r[i] = v
+   end
+   return r
+end
+
 
 function M.drop(arr, n)
    local r = M.bless({})
@@ -203,20 +316,6 @@ function M.count(arr, pred)
 end
 
 
-function M.find(arr, x)
-   local pred
-   if type(x) == 'function' then
-      pred = x
-   else
-      pred = function (y) return x == y end
-   end
-   for i, v in M.ipairs(arr) do
-      if pred(v) then
-	 return i
-      end
-   end
-   return nil
-end
 
 function M.any(arr, pred)
    for _, v in M.ipairs(arr) do
@@ -236,46 +335,11 @@ function M.every(arr, pred)
    return true
 end
 
-function M.foreach(arr, proc)
-   for _, v in M.ipairs(arr) do
-      proc(v)
-   end
-end
-
-function M.each(arr, proc)
-   for i, v in M.ipairs(arr) do
-      proc(v, i, arr)
-   end
-end
 
 
-function M.fold(arr, kons, knil)
-   local r = knil
-   for _, v in M.ipairs(arr) do
-      r = kons(v, r)
-   end
-   return r
-end
 
-function M.map(arr, proc)
-   local r = M.bless({})
-   for i, v in M.ipairs(arr) do
-      r[i] = proc(v)
-   end
-   return r
-end
 
-function M.filter(arr, pred)
-   local r = M.bless({})
-   local j = 1
-   for _, v in M.ipairs(arr) do
-      if pred(v) then
-	 r[j] = v
-	 j = j + 1
-      end
-   end
-   return r
-end
+
 
 function M.takewhile(arr, pred)
    local r = M.bless({})
@@ -306,6 +370,19 @@ function M.dropwhile(arr, pred)
    end
    return r
 end
+
+--[[--
+
+SEE ALSO
+========
+
+[tuit.list](list.html)
+
+AUTHOR
+======
+
+TAGA Yoshitaka.
+--]]--
 
 return M
 --- tuit/array.lua ends here
