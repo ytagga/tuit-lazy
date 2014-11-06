@@ -274,17 +274,11 @@ function M.take(arr, n)
    end
    return r
 end
-
-
-function M.copy(arr)
-   local r = M.bless({})
-   for i, v in M.ipairs(arr) do
-      r[i] = v
-   end
-   return r
-end
-
-
+--[[--
+* ``arr:drop(n)` - returns an array of all elements but the first `n`  ones of `arr`.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 3, 5}:drop(1), {3, 5})
 function M.drop(arr, n)
    local r = M.bless({})
    local j = 1
@@ -296,52 +290,12 @@ function M.drop(arr, n)
    end
    return r
 end
-
-function M.last(arr)
-   local r = nil
-   for _, v in M.ipairs(arr) do
-      r = v
-   end
-   return r
-end
-
-function M.count(arr, pred)
-   local r = 0
-   for _, v in M.ipairs(arr) do
-      if pred(v) then
-	 r = r + 1
-      end
-   end
-   return r
-end
-
-
-
-function M.any(arr, pred)
-   for _, v in M.ipairs(arr) do
-      if pred(v) then
-	 return true
-      end
-   end
-   return false
-end
-
-function M.every(arr, pred)
-   for _, v in M.ipairs(arr) do
-      if not pred(v) then
-	 return false
-      end
-   end
-   return true
-end
-
-
-
-
-
-
-
-function M.takewhile(arr, pred)
+--[[--
+* `arr:take_while(pred)` - returns the longest initial sequence of `arr` whose elements all satisfy the predicate `pred`.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 3, 5}:take_while(function (x) return x < 3 end), {1})
+function M.take_while(arr, pred)
    local r = M.bless({})
    local j = 1
    for _, v in M.ipairs(arr) do
@@ -354,22 +308,108 @@ function M.takewhile(arr, pred)
    end
    return r
 end
-
-function M.dropwhile(arr, pred)
+--[[--
+* `arr:drop_while(pred) - returns an array of all elements but the ones in the longest sequence whose elements all satisfy `pred`.
+--]]--
+---tap
+-- is_deeply(m.bless{1, 3, 5}:drop_while(function (x) return x < 3 end), {3, 5})
+function M.drop_while(arr, pred)
    local r = M.bless({})
-   local j = 2
+   local j
    local flag = false
    for _, v in M.ipairs(arr) do
       if flag then
-	 r[j] = v
 	 j = j + 1
+	 r[j] = v
       elseif not pred(v) then
 	 flag = true
-	 r[1] = v
+	 j = 1
+	 r[j] = v
       end
    end
    return r
 end
+--[[--
+* `arra:any(pred)` - returns `true` if `pred` returns true on any application, else returns `false`.
+--]]--
+---tap
+-- is(m.bless{1, 2, 3}:any(function (x) return x % 2 == 0 end), true)
+-- is(m.bless{1, 2, 3}:any(function (x) return x > 4 end), false)
+function M.any(arr, pred)
+   for _, v in M.ipairs(arr) do
+      if pred(v) then
+	 return true
+      end
+   end
+   return false
+end
+--[[--
+* `arr:every(pred)` - returns `true` if `pred` returns true on every application, else returns `false`.
+--]]--
+---tap
+-- is(m.bless{1, 2, 3}:every(function (x) return x % 2 == 0 end), false)
+-- is(m.bless{1, 2, 3}:every(function (x) return x < 4 end), true)
+function M.every(arr, pred)
+   for _, v in M.ipairs(arr) do
+      if not pred(v) then
+	 return false
+      end
+   end
+   return true
+end
+
+--[[--
+* `arr:count(pred)` - returns the number of the elements that satisfy `pred`
+--]]--
+---tap
+-- is(m.bless{1, 2, 3, 4, 5}:count(function (x) return x % 2 == 0 end), 2)
+function M.count(arr, pred)
+   local r = 0
+   for _, v in M.ipairs(arr) do
+      if pred(v) then
+	 r = r + 1
+      end
+   end
+   return r
+end
+--[[--
+* ``arr:last()` - returns the last element of `arr`.
+--]]--
+---tap
+-- is(m.bless{1, 2, 3, 4, 5}:last(), 5)
+function M.last(arr)
+   local r = nil
+   for _, v in M.ipairs(arr) do
+      r = v
+   end
+   return r
+end
+--[[--
+
+SEE ALSO
+========
+
+[tuit.list](list.html)
+
+AUTHOR
+======
+
+TAGA Yoshitaka
+
+--]]--
+--- tuit/array.lua ends here
+
+
+
+
+
+
+
+
+
+
+
+
 
 --[[--
 

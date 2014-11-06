@@ -1,6 +1,10 @@
+2014-11-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* tuit/array.lua: Rewritten
+
 2014-10-31  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
-	* tuit/list.lua (each: Added each, each_ipair, and each pair
+	* tuit/list.lua: Added each, each_ipair, and each pair
 
 2014-10-30  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 

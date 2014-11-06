@@ -1,6 +1,6 @@
 --- tap script - -*- mode:lua -*-
 _ = function ()
-plan(17)
+plan(26)
 m = eval[[require 'tuit.array']] or skip_all()
 is(m.bless{'a', 'b', 'c'}:count(function(x) return true end), 3)
 is_deeply(m.bless{1, 1}:unfold(
@@ -30,6 +30,15 @@ x, y = m.bless{1, 7, 5}:find(g)
 is(x, false)
 is(y, nil)
 is_deeply(m.bless{1, 2, 3}:take(2), {1, 2})
+is_deeply(m.bless{1, 3, 5}:drop(1), {3, 5})
+is_deeply(m.bless{1, 3, 5}:take_while(function (x) return x < 3 end), {1})
+is_deeply(m.bless{1, 3, 5}:drop_while(function (x) return x < 3 end), {3, 5})
+is(m.bless{1, 2, 3}:any(function (x) return x % 2 == 0 end), true)
+is(m.bless{1, 2, 3}:any(function (x) return x > 4 end), false)
+is(m.bless{1, 2, 3}:every(function (x) return x % 2 == 0 end), false)
+is(m.bless{1, 2, 3}:every(function (x) return x < 4 end), true)
+is(m.bless{1, 2, 3, 4, 5}:count(function (x) return x % 2 == 0 end), 2)
+is(m.bless{1, 2, 3, 4, 5}:last(), 5)
 summary()
 end
 f, v = pcall(_)

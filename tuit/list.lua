@@ -352,7 +352,7 @@ function M.drop_while(pred, lst)
    return lst
 end
 --[[--
-* `m.any(pred, lst1, ...)` - 
+* `m.any(pred, lst1, ...)` - returns `true` if `pred` returns true on any application, else returns `false`.
 --]]--
 ---tap
 -- is(m.any(function (x) return x == 2 end, {1, 2, 3}), true)
@@ -366,7 +366,7 @@ function M.any(pred, ...)
    return false
 end
 --[[--
-* `m.every(pred, lst1, ...)`
+* `m.every(pred, lst1, ...)` - returns `true` if `pred` returns true on every application, else returns `false`.
 --]]--
 ---tap
 -- is(m.every(function (x) return x == 2 end, {2, 2, 2}), true)
@@ -419,7 +419,20 @@ function M.apply(proc, lst)
 end
 
 --[[--
-
+* `m.count(pred, lst)` - returns the number of the elements in `lst` that satisfy `pred`
+--]]--
+---tap
+-- is(m.count(function (x) return x % 2 == 0 end, {1, 2, 3, 4, 5}), 2)
+function M.count(pred, lst)
+   local r = 0
+   for _, v in ipairs(lst) do
+      if pred(v) then
+	 r = r + 1
+      end
+   end
+   return r
+end
+--[[--
 * `m.last(lst)` - return the last element of list `lst`.
 --]]--
 ---tap
@@ -427,7 +440,6 @@ end
 function M.last(lst)
    return lst[#lst]
 end
-
 --[[--
 * m.first(lst)` - returns the first element of list `lst`.
 --]]--

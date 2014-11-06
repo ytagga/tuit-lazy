@@ -1,6 +1,6 @@
 --- tap script - -*- mode:lua -*-
 _ = function ()
-plan(48)
+plan(49)
 m = eval[[require 'tuit.list']] or skip_all()
 is_deeply(m.list(), {})
 is_deeply(m.list(1, 2, 3), {1, 2, 3})
@@ -55,6 +55,7 @@ ok(m.equal({{1, 2}, {3}}, {{1, 2}, {3}}))
 ok(m.equal({0, {1, 2}}, {0, {1, 2}}))
 g = function (x, y) return x - y end
 is(m.apply(g, {1, 2}), -1)
+is(m.count(function (x) return x % 2 == 0 end, {1, 2, 3, 4, 5}), 2)
 is(m.last({1, 2, 3}), 3)
 is(m.first({1, 2, 3}), 1)
 is(m.length({0, 1, 2}), 3)
