@@ -71,19 +71,27 @@ function M.bless(arr)
 end
 
 --[[--
-* `head:unfold([null], kar, [kdr, seed]) - is a generic recursive constructor.
-The default values of `seed` is `head`, that of `kdr` is the identity function,
-and that of `null` is a constant function that returns `false`.
+* `m.unfold([null], kar, [kdr, seed, head]) - is a generic recursive constructor.
+The default values of `seed` is `{}`, that of `head` is `seed` or `{}`, that of `kdr` is the identity function, and that of `null` is a constant function that returns `false`.
 --]]--
 ---tap
--- is_deeply(m.bless{1, 1}:unfold(
+-- is_deeply(m.unfold(
 --             function (x) return #x >= 5 end,
 --             function (x) return x[#x] + x[#x-1] end,
---             function (x) return x end),
+--             function (x) return x end,
+--             {1, 1}),
 --             {1, 1, 2, 3, 5})
--- is_deeply(m.bless():unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
-function M.unfold(head, pred, kar, kdr, seed)
-   seed = seed or head
+-- is_deeply(m.unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
+function M.unfold(pred, kar, kdr, seed, head)
+   seed = seed or {}
+   if head == nil then
+      if type(seed) == 'table' then
+	 head = seed
+      else
+	 head = {}
+      end
+   end
+   M.bless(head)
    kdr = kdr or function (x) return x end
    if kar == nil then
       kar = pred
@@ -103,13 +111,14 @@ function M.unfold(head, pred, kar, kdr, seed)
    return head
 end
 --[[--
-* head:range(init, finish, [step]) - 
+* m.range(init, finish, [step]) - returns an array beginning with `init` and ending with `finish`, stepping up or down by `step`.
 --]]--
 ---tap
--- is_deeply(m.bless():range(1, 5), {1, 2, 3, 4, 5})
--- is_deeply(m.bless():range(4, 1), {4, 3, 2, 1})
--- is_deeply(m.bless():range(4, 1, -2), {4, 2})
-function M.range(head, init, finish, step)
+-- is_deeply(m.range(1, 5), {1, 2, 3, 4, 5})
+-- is_deeply(m.range(4, 1), {4, 3, 2, 1})
+-- is_deeply(m.range(4, 1, -2), {4, 2})
+function M.range(init, finish, step)
+   local r = M.bless()
    step = step or 1
    if init > finish then
       if step > 0 then
@@ -120,19 +129,11 @@ function M.range(head, init, finish, step)
 	 step = - step
       end
    end
-   return M.unfold(head,
-		   function (x)
-		      if step > 0 then
-			 return x > finish
-		      else
-			 return x < finish
-		      end
-		   end,
-		   function (x) return x end,
-		   function (x) return x + step end,
-		   init)
+   for i = init, finish, step do
+      table.insert(r, i)
+   end
+   return r
 end
-
 --[[--
 
 iterator and accumulator
@@ -395,33 +396,6 @@ AUTHOR
 ======
 
 TAGA Yoshitaka
-
---]]--
---- tuit/array.lua ends here
-
-
-
-
-
-
-
-
-
-
-
-
-
---[[--
-
-SEE ALSO
-========
-
-[tuit.list](list.html)
-
-AUTHOR
-======
-
-TAGA Yoshitaka.
 --]]--
 
 return M

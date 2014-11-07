@@ -543,7 +543,81 @@ function M.flatten(x)
    flat(x, r)
    return r
 end
-
+--[[--
+* `m.push(lst, x, ..)` - treats `lst` as a stack, by appending `x`, ... to the end of `lst`.
+--]]--
+---tap
+-- is_deeply(m.push({1, 2, 3}, 4, 5), {1, 2, 3, 4, 5})
+function M.push(lst, ...)
+   for _, v in ipairs{...} do
+      table.insert(lst, v)
+   end
+   return lst
+end
+--[[--
+* `m.unshift(lst, x, ...)` - prepends `x, ... to the front of `lst`.
+--]]--
+---tap
+-- is_deeply(m.unshift({1, 2, 3}, 4, 5), {4, 5, 1, 2, 3})
+function M.unshift(lst, ...)
+   local r = {...}
+   for i = 1, #r do
+      table.insert(lst, i, r[i])
+   end
+   return lst
+end
+--[[--
+* `m.pop(lst, [n]) - pops the last `n` elements of `lst` and returns them.
+If `n` is ommitted, `n` is assumed to be `1`.
+--]]--
+---tap
+-- x = {1, 2, 3}
+-- y, z = m.pop(x, 2)
+-- is_deeply(x, {1})
+-- is(y, 2)
+-- is(z, 3)
+function M.pop(lst, n)
+   local r = {}
+   n = n or 1
+   for i = 1, n do
+      table.insert(r, 1, lst[#lst])
+      table.remove(lst, #lst)
+   end
+   return table.unpack(r)
+end
+--[[--
+* `m.shift(lst, [n])` - shifts the first `n` elements of `lst` and returns them. If `n` is ommitted, `n` is assumed to be `1`.
+--]]--
+---tap
+-- x = {1, 2, 3}
+-- y, z = m.shift(x, 2)
+-- is_deeply(x, {3})
+-- is(y, 1)
+-- is(z, 2)
+function M.shift(lst, n)
+   local r = {}
+   n = n or 1
+   for i = 1, n do
+      table.insert(r, lst[1])
+      table.remove(lst, 1)
+   end
+   return table.unpack(r)
+end
+--[[--
+* `m.values_at(lst, i, ...)` - returns the values of the elements whose indice are `i`, ...
+--]]--
+---tap
+-- x, y, z = m.values_at({1, 3, 5, 7, 9}, 2, 4)
+-- is(x, 3)
+-- is(y, 7)
+-- is(z, nil)
+function M.values_at(lst, ...)
+   local r = {}
+   for _, v in ipairs{...} do
+      table.insert(r, lst[v])
+   end
+   return table.unpack(r)
+end
 --[[--
 
 AUTHOR

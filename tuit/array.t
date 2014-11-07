@@ -3,15 +3,16 @@ _ = function ()
 plan(26)
 m = eval[[require 'tuit.array']] or skip_all()
 is(m.bless{'a', 'b', 'c'}:count(function(x) return true end), 3)
-is_deeply(m.bless{1, 1}:unfold(
+is_deeply(m.unfold(
             function (x) return #x >= 5 end,
             function (x) return x[#x] + x[#x-1] end,
-            function (x) return x end),
+            function (x) return x end,
+            {1, 1}),
             {1, 1, 2, 3, 5})
-is_deeply(m.bless():unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
-is_deeply(m.bless():range(1, 5), {1, 2, 3, 4, 5})
-is_deeply(m.bless():range(4, 1), {4, 3, 2, 1})
-is_deeply(m.bless():range(4, 1, -2), {4, 2})
+is_deeply(m.unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
+is_deeply(m.range(1, 5), {1, 2, 3, 4, 5})
+is_deeply(m.range(4, 1), {4, 3, 2, 1})
+is_deeply(m.range(4, 1, -2), {4, 2})
 is(m.bless{'a', 'b', 'c'}:fold(function (r, x) return r .. x end, 'X'), 'Xabc')
 is_deeply(m.bless{1, 2, 3}:map(function (x) return x + 1 end), {2, 3, 4})
 is_deeply(m.bless{1, 2, 3}:filter(function (x) return x % 2 == 0 end), {2})
