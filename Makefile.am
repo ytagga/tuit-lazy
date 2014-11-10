@@ -17,5 +17,4 @@ $(PACKAGE)-$(VERSION)-$(RELEASE).rockspec : rockspec.in
 
 clean-local :
 	-rm  $(PACKAGE)-$(VERSION)-$(RELEASE).rockspec
-
 # Makefile.am ends here

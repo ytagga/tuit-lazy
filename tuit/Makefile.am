@@ -1,10 +1,12 @@
 # tuit/Makefil.am
 
+SUBDIRS = array
+
 LUA = @LUA@
 
 tuitdir = $(datadir)/lua/$(LUA_VERSION)/@LUA_MODPATH@
 
-dist_tuit_DATA = combine.lua array.lua lazy.lua list.lua
+dist_tuit_DATA = combine.lua array.lua list.lua
 
 TESTS = $(dist_tuit_DATA:.lua=.t)
 TEST_EXTENSIONS = .t

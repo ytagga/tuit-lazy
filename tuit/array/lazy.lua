@@ -1,4 +1,4 @@
---- tuit/lazy.lua - iteration over a lazy-evaluated array
+--- tuit/array/lazy.lua - iteration over a lazy-evaluated array
 
 -------------------------------------------------------------------
 -- Copyright (C) 2013-2014 TAGA Yoshitaka <tagga@tsuda.ac.jp>
@@ -26,15 +26,15 @@
 
 require "tuit.array"
 
-tuit.lazy = tuit.lazy or {}
-setmetatable(tuit.lazy, { __index = tuit.array})
+tuit.array.lazy = tuit.array.lazy or {}
+setmetatable(tuit.array.lazy, { __index = tuit.array})
 
 table.unpack = table.unpack or unpack
 
-local M = tuit.lazy
+local M = tuit.array.lazy
 
 ---tap
--- m = eval[[require 'tuit.lazy']] or skip_all()
+-- m = eval[[require 'tuit.array.lazy']] or skip_all()
 
 function M.create(idxf, tab)
    tab = tab or {}
@@ -237,4 +237,4 @@ function M.drop_while(arr, pred)
 end
 
 return M
---- tuit/lazy.lua ends here
+--- tuit/array/lazy.lua ends here

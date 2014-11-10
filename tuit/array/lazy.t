@@ -1,7 +1,7 @@
 --- tap script - -*- mode:lua -*-
 _ = function ()
 plan(7)
-m = eval[[require 'tuit.lazy']] or skip_all()
+m = eval[[require 'tuit.array.lazy']] or skip_all()
 is_deeply(m.unfold(
             function (x) return false end,
             function (x) return x[#x] + x[#x-1] end,
