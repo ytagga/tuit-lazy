@@ -33,95 +33,133 @@ table.unpack = table.unpack or unpack
 
 local M = tuit.lazy
 
-M.class = M
+---tap
+-- m = eval[[require 'tuit.lazy']] or skip_all()
 
-function M.bless(from, tab, idxf)
+function M.create(idxf, tab)
    tab = tab or {}
-   local m = from.class
    if idxf then
       local f = function (t, n)
 		   if type(n) == "string" then
-		      return m[n]
+		      return M[n]
 		   else
 		      return idxf(t, n)
 		   end
 		end
       setmetatable(tab, { __index = f })
    else
-      setmetatable(tab, { __index = m })
+      setmetatable(tab, { __index = M })
    end
    return tab
 end
 
-function M.unfold_new(pred, f, seeds)
+local function unfolder(pred, kar, kdr, seed, head)
    local v
-   local f = function (t, n)
-		while pred(t) and #t < n do
-		   v = f(t)
-		   if v == nil then
-		      return nil
-		   end
-		   table.insert(t, v)
-		end
-		if #t == n then
-		   return v
-		else
-		   return nil
-		end
-	     end
-   return M.bless(M, seeds, f)
+   local i = 0
+   return coroutine.wrap(
+      function ()
+	 while i < #head do
+	    i = i + 1
+	    coroutine.yield(head[i])
+	 end
+	 while not(pred(seed)) do
+	    v = kar(seed)
+	    if v == nil then
+	       break
+	    end
+	    i = i + 1
+	    head[i] = v
+	    coroutine.yield(v)
+	    seed = kdr(seed)
+	 end
+	 return nil
+      end
+   )
 end
 
-
-function M.unfold(pred, proc, ...)
-   local seeds = {...}
-   local r = { table.unpack(seeds) }
-   local cnt = #r
-   local v
-   local f = function (t, n)
-		repeat
-		   cnt = cnt + 1
-		   v = proc(table.unpack(seeds))
-		   if v == nil or pred(v) then
-		      return nil
-		   end
-		   t[cnt] = v
-		   table.remove(seeds, 1)
-		   table.insert(seeds, v)
-		until cnt >= n
+local function unfold_indexer(pred, kar, kdr, seed, head)
+   seed = seed or {}
+   if head == nil then
+      if type(seed) == 'table' then
+	 head = seed
+      else
+	 head = {}
+      end
+   end
+   kdr = kdr or function (x) return x end
+   if kar == nil then
+      kar = pred
+      pred = function (x) return false end
+   end
+   local i = 0
+   local f = unfolder(pred, kar, kdr, seed, head)
+   local v = true
+   return function (t, n)
+	     if i > n then
+		return head[n]
+	     else
+		while i < n and v do
+		   i = i + 1
+		   v = f()
+		   head[i] = v
+		end
 		return v
 	     end
-   return M.bless(M, r, f)
+	  end, head
 end
 
-function M.iota(cnt, init, step)
-   init = init or 0
+--[[--
+--]]--
+---tap
+-- is_deeply(m.unfold(
+--             function (x) return false end,
+--             function (x) return x[#x] + x[#x-1] end,
+--             function (x) return x end,
+--             {1, 1}):take(5),
+--             {1, 1, 2, 3, 5})
+-- is_deeply(m.unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
+function M.unfold(pred, kar, kdr, seed, head)
+   return M.create(unfold_indexer(pred, kar, kdr, seed, head))
+end
+--[[--
+--]]--
+---tap
+-- is_deeply(m.range(1, math.huge):take(5), {1, 2, 3, 4, 5})
+function M.range(init, finish, step)
    step = step or 1
-   local r = {}
+   if init > finish then
+      if step > 0 then
+	 step = - step
+      end
+   else
+      if step < 0 then
+	 step = - step
+      end
+   end
    local v
-   local f = function (t, n)
-		if n <= cnt then
-		   v = init + (n - 1) * step
-		   t[n] = v
-		   return v
-		else
-		   return nil
-		end
-	     end
-   return M.bless(M, r, f)
+   return M.create(function (t, n)
+		      v = init + step * (n - 1)
+		      t[n] = v
+		      return v
+		   end,
+		   {})
 end
-
+--[[--
+--]]--
+---tap
+-- is_deeply(m.range(1, math.huge):map(function (x) return x * 2 end):take(5), {2, 4, 6, 8, 10})
 function M.map(arr, proc)
    local r = {}
    local v
    local f = function (t, n)
 		v = proc(arr[n])
-		t[n] = v
+		r[n] = v
 		return v
 	     end
-   return M.bless(arr, r, f)
+   return M.create(f, r)
 end
-
+---tap
+-- is_deeply(m.range(1, math.huge):filter(function (x) return x % 2 == 0 end):take(5), {2, 4, 6, 8, 10})
 function M.filter(arr, pred)
    local r = {}
    local icnt = 0
@@ -137,25 +175,32 @@ function M.filter(arr, pred)
 			 return nil
 		      end
 		   until pred(v)
-		   t[ocnt] = v
+		   r[ocnt] = v
 		until ocnt >= n
 		return v
 	     end
-   return M.bless(arr, r, f)
+   return M.create(f, r)
 end
 
+--[[--
+--]]--
+---tap
+-- is_deeply(m.range(1, math.huge):drop(3):take(5), {4, 5, 6, 7, 8})
 function M.drop(arr, k)
    local r = {}
    local v
    local f = function (t, n)
 		v = arr[n + k]
-		t[n] = v
+		r[n] = v
 		return v
 	     end
-   return M.bless(arr, r, f)
+   return M.create(f, r)
 end
-
-function M.dropwhile(arr, pred)
+--[[--
+--]]--
+---tap
+-- is_deeply(m.range(1, math.huge):drop_while(function (x) return x < 3 end):take(5), {3, 4, 5, 6, 7})
+function M.drop_while(arr, pred)
    local r = {}
    local cnt = 0
    local v
@@ -188,7 +233,7 @@ function M.dropwhile(arr, pred)
 		   return v
 		end
 	     end
-   return M.bless(arr, r, f)
+   return M.create(f, r)
 end
 
 return M
