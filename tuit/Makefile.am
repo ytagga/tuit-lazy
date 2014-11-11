@@ -2,30 +2,25 @@
 
 SUBDIRS = array
 
-LUA = @LUA@
+LUA = LUA_PATH="../?.lua;;" @LUA@
 
 tuitdir = $(datadir)/lua/$(LUA_VERSION)/@LUA_MODPATH@
 
 dist_tuit_DATA = combine.lua array.lua list.lua
 
-TESTS = $(dist_tuit_DATA:.lua=.t)
-TEST_EXTENSIONS = .t
-T_LOG_COMPILER = $(LUA)
-AM_TESTS_ENVIRONMENT = LUA_PATH="../aux/?.lua;../?.lua;;" ; export LUA_PATH;
-AM_T_LOG_FLAGS = -l tap
-
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = $(dist_tuit_DATA:.lua=.t)
 
 MARKDOWN = $(HOME)/bin/markdown.lua
 docfiles = combine.html list.html array.html
 
 .lua.html :
-	LUA_PATH="../aux/?.lua;;" $(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@
+	$(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@
 
 doc : $(docfiles)
 
+check-local : $(EXTRA_DIST)
 
 .lua.t :
-	LUA_PATH="../aux/?.lua;;" $(LUA) -l scrape -e "tap()" < $? > $@
+	$(LUA) -l tuit.tap -e "tuit.tap.scrape()" < $? > $@
 
 # tuit/Makefil.am ends here

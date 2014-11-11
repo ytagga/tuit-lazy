@@ -1,6 +1,6 @@
 --- tap script - -*- mode:lua -*-
-_ = function ()
-plan(26)
+require "tuit.tap"
+local t = loadstring [=====[
 m = eval[[require 'tuit.array']] or skip_all()
 is(m.bless{'a', 'b', 'c'}:count(function(x) return true end), 3)
 is_deeply(m.unfold(
@@ -40,7 +40,13 @@ is(m.bless{1, 2, 3}:every(function (x) return x % 2 == 0 end), false)
 is(m.bless{1, 2, 3}:every(function (x) return x < 4 end), true)
 is(m.bless{1, 2, 3, 4, 5}:count(function (x) return x % 2 == 0 end), 2)
 is(m.bless{1, 2, 3, 4, 5}:last(), 5)
-summary()
+]=====]
+if t == nil then
+  skip_all("broken test script")
 end
-f, v = pcall(_)
-if not(f) then bail_out(v) end
+plan(26)
+local f, v = pcall(t)
+if not(f) then
+   bail_out(v)
+end
+os.exit(tuit.tap.not_ok)
