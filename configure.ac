@@ -25,5 +25,5 @@ AC_SUBST(LUA_MODPATH)
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile aux/Makefile tuit/Makefile tuit/array/Makefile])
+AC_CONFIG_FILES([Makefile aux/Makefile doc/Makefile tuit/Makefile tuit/array/Makefile])
 AC_OUTPUT

@@ -1,8 +1,10 @@
 # Makefile.am
 
-SUBDIRS = tuit aux
+SUBDIRS = tuit aux doc
 
 LUA = @LUA@
+
+EXTRA_DIST = rockspec.in
 
 RELEASE = 1
 
