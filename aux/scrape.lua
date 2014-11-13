@@ -1,4 +1,4 @@
---- scrape.lua - scrape comments up from a lua file
+--- scrape.lua - gather up comments from a lua file
 ------------------------------------------------------------------
 -- Copyright (C) 2014 TAGA Yoshitaka <tagga@tsuda.ac.jp>
 --
@@ -22,15 +22,21 @@
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 ------------------------------------------------------------------
---[[--
-NAME scrape.lua
-===============
 
-     Usage: lua -l scrape -e "doc()" < foo.lua > foo.md
-        or: lua -l scrape -e "tap()" < foo.lua > foo.t
+argv = require "tuit.cmdline" [=[
+aux/scrape.lua (tuit-auxliary) 0.01
 
-* `doc()` - gather up longer comments
---]]--
+Usage: lua %s --tap FOO.lua > FOO.t
+   or: lua %s --doc FOO.lua > FOO.md
+Gather up comments from a Lua file
+
+     -d, --doc        collect long comments between --[[-- and --]]--
+     -t, --tap        collect comments lines beginnng with ---tap (default)
+         --help       display this message and exit
+         --version    output version information and exit
+]=]
+
+-- doc() ------------------------------------------------
 function doc()
    local sw = false
 
@@ -44,14 +50,27 @@ function doc()
       end
    end
 end
---[[--
-* `tap()` - gather up shorter comment lines preceeded by `---tap`
---]]--
+
+-- tap() ------------------------------------------------
+local check_func_tab = {}
+
+-- Chnage this table if you rewrite tuit/tap.lua! --
+for i, v in ipairs{'ok', 'is', 'isnt', 'like', 'unlike', 'isa', 'is_deeply'} do
+   check_func_tab[v] = i
+end
+
+local function has_check_func(line)
+   local v = string.match(line, "^%s*([%w_]+)")
+   return check_func_tab[v]
+end
+
 function tap()
    local sw = false
-   local keep = {}
    local cnt = 0
 
+   print("--- tap script - -*- mode:lua -*-")
+   print('require "tuit.tap"')
+   print("local t = loadstring [=====[")
    for line in io.lines() do
       if string.match(line, "^%-%-%-tap") then
 	 sw = true
@@ -59,23 +78,31 @@ function tap()
 	 sw = false
       elseif sw then
 	 line = string.sub(line, 4)
-	 if string.match(line, "^%s*is") or string.match(line, "^%s*ok") or string.match(line, "^%s*(un)?like") then
+	 if has_check_func(line) then
 	    cnt = cnt + 1
 	 end
-	 table.insert(keep, line)
-      end
-   end
-   if cnt > 0 then
-      print("--- tap script - -*- mode:lua -*-")
-      print("_ = function ()")
-      print("plan(" .. cnt .. ")")
-      for _, line in ipairs(keep) do
 	 print(line)
       end
-      print("summary()")
-      print("end")
-      print("f, v = pcall(_)")
-      print("if not(f) then bail_out(v) end")
    end
+   print("]=====]")
+   print("if t == nil then")
+   print('  skip_all("broken test script")')
+   print("end")
+   print("plan(" .. cnt .. ")")
+   print("local f, v = pcall(t)")
+   print("if not(f) then")
+   print("   bail_out(v)")
+   print("end")
+   print("os.exit(tuit.tap.not_ok)")
+end
+
+-- main -------------------------------------------------
+if #argv > 0 then
+   io.input(argv[1])
+end
+if argv.doc then
+   doc()
+else
+   tap()
 end
 --- scrape.lua ends here

@@ -2,25 +2,22 @@
 
 SUBDIRS = array
 
-LUA = LUA_PATH="../?.lua;;" @LUA@
+LUA = LUA_PATH="$(top_srcdir)/?.lua;;" @LUA@
 
 tuitdir = $(datadir)/lua/$(LUA_VERSION)/@LUA_MODPATH@
 
 dist_tuit_DATA = combine.lua array.lua list.lua
 
-EXTRA_DIST = $(dist_tuit_DATA:.lua=.t)
+tests = $(dist_tuit_DATA:.lua=.t)
 
-MARKDOWN = $(HOME)/bin/markdown.lua
-docfiles = combine.html list.html array.html
+EXTRA_DIST = $(tests) tap.lua cmdline.lua
 
-.lua.html :
-	$(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@
-
-doc : $(docfiles)
-
-check-local : $(EXTRA_DIST)
+check-local : $(tests)
 
 .lua.t :
-	$(LUA) -l tuit.tap -e "tuit.tap.scrape()" < $? > $@
+	$(LUA) $(top_srcdir)/aux/scrape.lua --tap $? > $@
+
+distclean-local :
+	-rm $(tests)
 
 # tuit/Makefil.am ends here

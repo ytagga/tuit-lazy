@@ -7,7 +7,6 @@ AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 AC_CHECK_PROGS([LUA], [lua wlua lua5.2 lua5.1])
-AC_CHECK_PROGS([PROVE], [prove])
 
 LUA_VERSION=`$ac_cv_prog_LUA -e "print(string.match(_VERSION, '([[.%d]]+)'))"`
 AC_SUBST([LUA_VERSION])
@@ -26,5 +25,5 @@ AC_SUBST(LUA_MODPATH)
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile tuit/Makefile tuit/array/Makefile])
+AC_CONFIG_FILES([Makefile aux/Makefile tuit/Makefile tuit/array/Makefile])
 AC_OUTPUT

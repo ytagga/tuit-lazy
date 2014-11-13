@@ -1,24 +1,21 @@
 # tuit/array/Makefil.am
 
-LUA = LUA_PATH="../../?.lua;;" @LUA@
+LUA = LUA_PATH="$(top_srcdir)/?.lua;;" @LUA@
 
 tuitarraydir = $(datadir)/lua/$(LUA_VERSION)/@LUA_MODPATH@/array
 
 dist_tuitarray_DATA = lazy.lua
 
-EXTRA_DIST = $(dist_tuitarray_DATA:.lua=.t)
+tests = $(dist_tuitarray_DATA:.lua=.t)
 
-MARKDOWN = $(HOME)/bin/markdown.lua
-docfiles = lazy.html
+EXTRA_DIST = $(tests)
 
-.lua.html :
-	$(LUA) -l scrape -e "doc()" < $? | $(MARKDOWN) > $@
-
-doc : $(docfiles)
-
-check-local : $(EXTRA_DIST)
+check-local : $(tests)
 
 .lua.t :
-	$(LUA) -l tuit.tap -e "tuit.tap.scrape()" < $? > $@
+	$(LUA) $(top_srcdir)/aux/scrape.lua --tap $? > $@
+
+distclean-local :
+	-rm $(tests)
 
 # tuit/array/Makefil.am ends here

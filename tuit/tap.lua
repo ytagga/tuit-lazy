@@ -32,7 +32,7 @@ tuit.tap - simple testsuite for the Test Anything Protocol
 SYNOPSIS
 ========
 
-     lua -l tuit.tap -e 'scrape()' < foo.lua > foo.t
+     lua -l tuit.tap -e 'tuit.tap.scrape()' < foo.lua > foo.t
      lua -l tuit.tap foo.t > foo.log
 
 --]]--
@@ -85,6 +85,8 @@ end
 function skip_on_error(msg)
    if M.err then
       M.skip = msg or M.err
+   else
+      M.skip = nil
    end
 end
 --[[--
@@ -129,12 +131,16 @@ local function pretty(x)
 end
 --- the main part of check functions
 local function check(expr, val, msg, cv)
+   if not(M.cnt) then
+      M.cnt = 0
+      M.not_ok = 0
+   end
    M.cnt = M.cnt + 1
    local which = "not ok"
    local diff
 
    if M.skip then
-      which = ok
+      which = "ok"
    elseif M.err then
       M.not_ok = M.not_ok + 1
       diff = M.err
@@ -235,38 +241,6 @@ end
 function bail_out(msg)
    print("Bail out! - " .. msg)
    os.exit(255)
-end
-
-function M.scrape()
-   local sw = false
-   local cnt = 0
-
-   print("--- tap script - -*- mode:lua -*-")
-   print('require "tuit.tap"')
-   print("local t = loadstring [=====[")
-   for line in io.lines() do
-      if string.match(line, "^%-%-%-tap") then
-	 sw = true
-      elseif not(string.match(line, "^%-%- ")) then
-	 sw = false
-      elseif sw then
-	 line = string.sub(line, 4)
-	 if string.match(line, "^%s*is") or string.match(line, "^%s*ok") or string.match(line, "^%s*(un)?like") then
-	    cnt = cnt + 1
-	 end
-	 print(line)
-      end
-   end
-   print("]=====]")
-   print("if t == nil then")
-   print('  skip_all("broken test script")')
-   print("end")
-   print("plan(" .. cnt .. ")")
-   print("local f, v = pcall(t)")
-   print("if not(f) then")
-   print("   bail_out(v)")
-   print("end")
-   print("os.exit(tuit.tap.not_ok)")
 end
 
 return M
