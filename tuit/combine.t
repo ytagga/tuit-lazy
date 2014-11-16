@@ -1,7 +1,8 @@
 --- tap script - -*- mode:lua -*-
 require "tuit.tap"
 local t = loadstring [=====[
-m = eval[[require 'tuit.combine']] or skip_all()
+m = assert(require 'tuit.combine')
+plan(49)
 g1 = function (x) return x + 3 end
 g2 = function (x) return x * 2 end
 is(m.comp(g1, g2)(5), 5 * 2 + 3)
@@ -68,7 +69,6 @@ is(m.call(g, 'a', 'b'), g('a', 'b'))
 if t == nil then
   skip_all("broken test script")
 end
-plan(49)
 local f, v = pcall(t)
 if not(f) then
    bail_out(v)

@@ -1,7 +1,8 @@
 --- tap script - -*- mode:lua -*-
 require "tuit.tap"
 local t = loadstring [=====[
-m = eval[[require 'tuit.list']] or skip_all()
+m = assert(require 'tuit.list')
+plan(60)
 is_deeply(m.list(), {})
 is_deeply(m.list(1, 2, 3), {1, 2, 3})
 a = {1, 2, 3}
@@ -88,7 +89,6 @@ is(z, nil)
 if t == nil then
   skip_all("broken test script")
 end
-plan(60)
 local f, v = pcall(t)
 if not(f) then
    bail_out(v)

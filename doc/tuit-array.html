@@ -2,29 +2,36 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title>NAME</title>
+	<title>../tuit/array.lua</title>
 	<link rel="stylesheet" type="text/css" href="default.css" />
 </head>
 <body>
 
 
-<h1>NAME</h1>
+<h1>tuit.array</h1>
+
+<h2>NAME</h2>
 
 <p>tuit.array - iteration over a linear table</p>
 
-<h1>SYNOPSIS</h1>
+<h2>SYNOPSIS</h2>
 
-<pre><code> m = require "tuit.array"
+<pre><code> M = require "tuit.array"
+ return M.unfold(
+          function (x) return #x &gt;= 10 end,
+          function (x) return x[#x] + x[#x-1] end,
+          function (x) return x end,
+          {1, 1}):take(5) -- {1, 1, 2, 3, 5}
 </code></pre>
 
-<h1>DESCRIPTION</h1>
+<h2>DESCRIPTION</h2>
 
 <p>This module provides linear list functions.
 Some have a similar one in tuit.list' module,
 but the order of the arguments may be different.
-The first argument of most functions are a list.</p>
+The first argument of most functions in this module is a list.</p>
 
-<h2>objectifier and constructors</h2>
+<h2>Objectifier and constructors</h2>
 
 <ul>
     <li><code>m.bless(arr)</code> - tells list <code>arr</code> that it should work as <code>tuit.array</code> object.</li>

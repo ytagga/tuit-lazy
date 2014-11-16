@@ -17,9 +17,10 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["tuit.array"] = "tuit/array.lua",
       ["tuit.array.lazy"] = "tuit/array/lazy.lua",
-      ["tuit.combine"] = "tuit/combine.lua",
+      ["tuit.array.nonce"] = "tuit/array/nonce.lua",
+      ["tuit.array"] = "tuit/array.lua",
       ["tuit.list"] = "tuit/list.lua"
+      ["tuit.combine"] = "tuit/combine.lua",
   }
 }

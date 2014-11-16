@@ -1,7 +1,14 @@
 --- tap script - -*- mode:lua -*-
 require "tuit.tap"
 local t = loadstring [=====[
-m = eval[[require 'tuit.array.lazy']] or skip_all()
+m = assert(require 'tuit.array.lazy')
+plan(11)
+y = 0
+x = m.bless(function (t, n) y = y + 1; return y end)
+isa(x, 'table')
+is(x[1], 1)
+is(x[2], 2)
+is(x[1], 1)
 is_deeply(m.unfold(
             function (x) return false end,
             function (x) return x[#x] + x[#x-1] end,
@@ -18,7 +25,6 @@ is_deeply(m.range(1, math.huge):drop_while(function (x) return x < 3 end):take(5
 if t == nil then
   skip_all("broken test script")
 end
-plan(7)
 local f, v = pcall(t)
 if not(f) then
    bail_out(v)

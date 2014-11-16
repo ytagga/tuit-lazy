@@ -2,30 +2,33 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title>NAME</title>
+	<title>../tuit/list.lua</title>
 	<link rel="stylesheet" type="text/css" href="default.css" />
 </head>
 <body>
 
 
-<h1>NAME</h1>
+<h1>tuit.list</h1>
+
+<h2>NAME</h2>
 
 <p>tuit.list - list library</p>
 
-<h1>SYNOPSIS</h1>
+<h2>SYNOPSIS</h2>
 
 <pre><code> m = require "tuit.list"
  r = m.equal({1, 2, {3}}, {1, 2, {3}}) -- true
 </code></pre>
 
 
-<h1>DESCRIPTION</h1>
+<h2>DESCRIPTION</h2>
 
 <p>This module provides linear list functions.
 Some have a similar one in tuit.array' module,
 but the order of the arguments may be different.</p>
 
-<h2>constructors</h2>
+
+<h3>constructors</h3>
 
 <ul>
     <li><p><code>m.list(obj1, obj2, ...)</code> - returns a newly allocated list of its arguments.</p></li>
@@ -49,7 +52,7 @@ the following funtion:</p>
 or if <code>kar(seed)</code> returns <code>nil</code>. If <code>head</code> is omitted, <code>{}</code> is used
 instead.</p>
 
-<h2><code>fold</code> and other acumulator functions</h2>
+<h3><code>fold</code> and other acumulator functions</h3>
 
 <ul>
     <li><code>m.fold_left(proc, init. lst1, ...)</code> - iterates function <code>proc</code> over an acumulator value and the elements of lists <code>lst1</code>, ... from left to right, starting with an acumulator value <code>init</code>. If <code>lst</code> is empty, it returns <code>init</code>.</li>
@@ -58,7 +61,7 @@ instead.</p>
     <li><code>m.reduce_right(proc, lst)</code> - iterates function <code>proc</code> over an acumulator value and the elements of list <code>lst</code> from right to left, starting with the last element of <code>lst</code>.</li>
 </ul>
 
-<h2>map, filter, and selectors</h2>
+<h3><code>map</code>, <code>filter</code>, and selectors</h3>
 
 <ul>
     <li><p><code>m.map(proc, lst1, lst2, ...)</code> - applies <code>proc</code> element-wise to the elements of the lists in order and returns a list of the results.</p></li>
@@ -76,32 +79,32 @@ instead.</p>
     <li><p><code>m.every(pred, lst1, ...)</code> - returns <code>true</code> if <code>pred</code> returns true on every application, else returns <code>false</code>.</p></li>
 </ul>
 
-<h2>miscellaneous</h2>
+<h3>miscellaneous</h3>
 
 <ul>
-    <li><p><code>m.equal(x, y)</code> - returns <code>true</code> if and only if <code>a</code> and <code>b</code> are recursively
-    equivalent.</p></li>
-    <li><p><code>m.apply(proc, lst)</code> applies procedure <code>proc</code> to a list of arguments <code>lst</code>.</p></li>
-    <li><p><code>m.count(pred, lst)</code> - returns the number of the elements in <code>lst</code> that satisfy <code>pred</code></p></li>
-    <li><p><code>m.last(lst)</code> - return the last element of list <code>lst</code>.</p></li>
-    <li><p>m.first(lst)<code>- returns the first element of list</code>lst`.</p></li>
-    <li><p><code>m.length(lst)</code> - return the length of list <code>lst</code>.</p></li>
-    <li><p><code>m.append(lst1, lst2)</code> - appends the elements of list <code>lst2</code> to list <code>lst1</code>.</p></li>
-    <li><p><code>m.reverse(lst)</code> - reverses the order of list <code>lst</code>.</p></li>
-    <li><p><code>m.zip(lst1, lst2, ...)</code> - With <code>n</code> lists, it returns a list
+    <li><code>m.equal(x, y)</code> - returns <code>true</code> if and only if <code>a</code> and <code>b</code> are recursively
+    equivalent.</li>
+    <li><code>m.apply(proc, lst)</code> applies procedure <code>proc</code> to a list of arguments <code>lst</code>.</li>
+    <li><code>m.count(pred, lst)</code> - returns the number of the elements in <code>lst</code> that satisfy <code>pred</code></li>
+    <li><code>m.last(lst)</code> - return the last element of list <code>lst</code>.</li>
+    <li>m.first(lst)<code>- returns the first element of list</code>lst`.</li>
+    <li><code>m.length(lst)</code> - return the length of list <code>lst</code>.</li>
+    <li><code>m.append(lst1, lst2)</code> - appends the elements of list <code>lst2</code> to list <code>lst1</code>.</li>
+    <li><code>m.reverse(lst)</code> - reverses the order of list <code>lst</code>.</li>
+    <li><code>m.zip(lst1, lst2, ...)</code> - With <code>n</code> lists, it returns a list
     as long as the shortest of these lists,
     each element of which is an <code>n</code>-element list comprised of
-    the corresponding elements from the parameter lists.</p></li>
-    <li><p><code>m.flatten(lst)</code> - flattens list <code>lst</code>.</p></li>
-    <li><p><code>m.push(lst, x, ..)</code> - treats <code>lst</code> as a stack, by appending <code>x</code>, ... to the end of <code>lst</code>.</p></li>
-    <li><p><code>m.unshift(lst, x, ...)</code> - prepends <code>x, ... to the front of</code>lst`.</p></li>
-    <li><p><code>m.pop(lst, [n]) - pops the last</code>n<code>elements of</code>lst` and returns them.
-    If <code>n</code> is ommitted, <code>n</code> is assumed to be <code>1</code>.</p></li>
-    <li><p><code>m.shift(lst, [n])</code> - shifts the first <code>n</code> elements of <code>lst</code> and returns them. If <code>n</code> is ommitted, <code>n</code> is assumed to be <code>1</code>.</p></li>
-    <li><p><code>m.values_at(lst, i, ...)</code> - returns the values of the elements whose indice are <code>i</code>, ...</p></li>
+    the corresponding elements from the parameter lists.</li>
+    <li><code>m.flatten(lst)</code> - flattens list <code>lst</code>.</li>
+    <li><code>m.push(lst, x, ..)</code> - treats <code>lst</code> as a stack, by appending <code>x</code>, ... to the end of <code>lst</code>.</li>
+    <li><code>m.unshift(lst, x, ...)</code> - prepends <code>x, ... to the front of</code>lst`.</li>
+    <li><code>m.pop(lst, [n]) - pops the last</code>n<code>elements of</code>lst` and returns them.
+    If <code>n</code> is ommitted, <code>n</code> is assumed to be <code>1</code>.</li>
+    <li><code>m.shift(lst, [n])</code> - shifts the first <code>n</code> elements of <code>lst</code> and returns them. If <code>n</code> is ommitted, <code>n</code> is assumed to be <code>1</code>.</li>
+    <li><code>m.values_at(lst, i, ...)</code> - returns the values of the elements whose indice are <code>i</code>, ...</li>
 </ul>
 
-<h1>AUTHOR</h1>
+<h2>AUTHOR</h2>
 
 <p>TAGA Yoshitaka</p>
 

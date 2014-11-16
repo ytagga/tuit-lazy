@@ -1,15 +1,17 @@
 # doc/Makefile.am
 
-htmlfiles = index.html tuit-array.html tuit-list.html tuit-combine.html tuit-array-lazy.html
+htmlfiles = index.html
+htmlfiles += tuit-array.html tuit-list.html tuit-combine.html
+htmlfiles += tuit-array-lazy.html tuit-array-nonce.html
 
 index.html : ../README.md
 	sed -e s!\(doc/!\(! $? | markdown.lua --title "README" > $@
 
 tuit-%.html : ../tuit/%.lua
-	LUA_PATH="../?.lua;;" lua ../aux/scrape.lua -d $? | markdown.lua > $@
+	LUA_PATH="../?.lua;;" lua ../aux/scrape.lua -d $? | markdown.lua --title $? > $@
 
 tuit-array-%.html : ../tuit/array/%.lua
-	LUA_PATH="../?.lua;;" lua ../aux/scrape.lua -d $? | markdown.lua > $@
+	LUA_PATH="../?.lua;;" lua ../aux/scrape.lua -d $? | markdown.lua --title $? > $@
 
 html-local : $(htmlfiles)
 

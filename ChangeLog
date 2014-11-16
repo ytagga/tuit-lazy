@@ -1,3 +1,7 @@
+2014-11-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* tuit/array/nonce.lua: Added
+
 2014-11-10  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* tuit/lazy.lua: Rewriting

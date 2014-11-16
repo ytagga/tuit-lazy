@@ -34,31 +34,39 @@ table.unpack = table.unpack or unpack
 
 --[[--
 
+tuit.array
+==========
+
 NAME
-====
+----
 
 tuit.array - iteration over a linear table
 
 SYNOPSIS
-========
+--------
 
-     m = require "tuit.array"
+     M = require "tuit.array"
+     return M.unfold(
+              function (x) return #x >= 10 end,
+              function (x) return x[#x] + x[#x-1] end,
+              function (x) return x end,
+              {1, 1}):take(5) -- {1, 1, 2, 3, 5}
 
 DESCRIPTION
-===========
+-----------
 
 This module provides linear list functions.
 Some have a similar one in tuit.list' module,
 but the order of the arguments may be different.
-The first argument of most functions are a list.
+The first argument of most functions in this module is a list.
 
-objectifier and constructors
+Objectifier and constructors
 ----------------------------
 
 --]]--
 ---tap
--- m = eval[[require 'tuit.array']] or skip_all()
-
+-- m = assert(require 'tuit.array')
+-- plan()
 --[[--
 * `m.bless(arr)` - tells list `arr` that it should work as `tuit.array` object.
 --]]--

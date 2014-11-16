@@ -29,25 +29,29 @@ tuit.combine = tuit.combine or {}
 
 --[[--
 
+tuit.combine
+============
+
 NAME
-====
+----
 
 tuit.combine - functions for functional programming
 
 SYNOPSIS
-========
+--------
 
      m = require "tuit.combine"
      print(m.fix(function () return m.const(9) end)(3)) -- 9
 
 DESCRIPTION
-===========
+-----------
 
 This module provides utility functions for functional programming.
 
 --]]--
 ---tap
--- m = eval[[require 'tuit.combine']] or skip_all()
+-- m = assert(require 'tuit.combine')
+-- plan()
 
 local M = tuit.combine
 
@@ -55,8 +59,7 @@ table.unpack = table.unpack or unpack
 
 --[[--
 
-high-order functions
---------------------
+### high-order functions ###
 
 * `m.comp(f1, f2, ..., fn)` - composition  
   This function makes a composite function of `f1, f2, ..., fn`,
@@ -164,8 +167,7 @@ end
 
 --[[--
 
-combinators
------------
+### combinators ###
 
 * `m.fix(f)` -- fix point combinator  
    This function return a function which computes a fix-point of `f`.
@@ -208,8 +210,7 @@ end
 
 --[[--
 
-utility functions
------------------
+### utility functions ###
 
 * `m.null(x)` -  null?  
    This function checks if the argument is `nil`.
@@ -234,8 +235,7 @@ end
 
 --[[--
 
-wrappers of Lua operators
--------------------------
+### wrappers of Lua operators ###
 
 * `m.add(x, y)` - `x + y`
 --]]--
@@ -368,7 +368,7 @@ function M.call(f, ...) return f(...) end
 --[[--
 
 AUTHOR
-======
+------
 
 TAGA Yoshitaka
 

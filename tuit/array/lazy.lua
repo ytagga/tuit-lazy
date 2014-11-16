@@ -33,22 +33,40 @@ table.unpack = table.unpack or unpack
 
 local M = tuit.array.lazy
 
----tap
--- m = eval[[require 'tuit.array.lazy']] or skip_all()
+M.class = M
+M.newindex = nil
 
-function M.create(idxf, tab)
+---tap
+-- m = assert(require 'tuit.array.lazy')
+-- plan()
+-- y = 0
+-- x = m.bless(function (t, n) y = y + 1; return y end)
+-- isa(x, 'table')
+-- is(x[1], 1)
+-- is(x[2], 2)
+-- is(x[1], 1)
+
+function M.bless(obj, idxf, tab)
+   if type(obj) == 'function' then
+      tab = idxf
+      idxf = obj
+      obj = M
+   end
    tab = tab or {}
    if idxf then
+      local v
       local f = function (t, n)
 		   if type(n) == "string" then
 		      return M[n]
 		   else
-		      return idxf(t, n)
+		      v = idxf(t, n)
+		      t[n] = v
+		      return v
 		   end
 		end
-      setmetatable(tab, { __index = f })
+      setmetatable(tab, { __index = f, __newindex = obj.newindex })
    else
-      setmetatable(tab, { __index = M })
+      setmetatable(tab, { __index = obj.class, __newindex = obj.newindex  })
    end
    return tab
 end
@@ -119,7 +137,7 @@ end
 --             {1, 1, 2, 3, 5})
 -- is_deeply(m.unfold(string.gmatch("a b c", "(%S+)")), {'a', 'b', 'c'})
 function M.unfold(pred, kar, kdr, seed, head)
-   return M.create(unfold_indexer(pred, kar, kdr, seed, head))
+   return M.bless(unfold_indexer(pred, kar, kdr, seed, head))
 end
 --[[--
 --]]--
@@ -137,12 +155,11 @@ function M.range(init, finish, step)
       end
    end
    local v
-   return M.create(function (t, n)
+   return M.bless(function (t, n)
 		      v = init + step * (n - 1)
 		      t[n] = v
 		      return v
-		   end,
-		   {})
+		end)
 end
 --[[--
 --]]--
@@ -156,7 +173,7 @@ function M.map(arr, proc)
 		r[n] = v
 		return v
 	     end
-   return M.create(f, r)
+   return M.bless(arr, f, r)
 end
 ---tap
 -- is_deeply(m.range(1, math.huge):filter(function (x) return x % 2 == 0 end):take(5), {2, 4, 6, 8, 10})
@@ -179,7 +196,7 @@ function M.filter(arr, pred)
 		until ocnt >= n
 		return v
 	     end
-   return M.create(f, r)
+   return M.bless(arr, f, r)
 end
 
 --[[--
@@ -194,7 +211,7 @@ function M.drop(arr, k)
 		r[n] = v
 		return v
 	     end
-   return M.create(f, r)
+   return M.bless(arr, f, r)
 end
 --[[--
 --]]--
@@ -233,7 +250,7 @@ function M.drop_while(arr, pred)
 		   return v
 		end
 	     end
-   return M.create(f, r)
+   return M.bless(arr, f, r)
 end
 
 return M

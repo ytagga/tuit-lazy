@@ -30,20 +30,23 @@ table.unpack = table.unpack or unpack
 
 --[[--
 
+tuit.list
+=========
+
 NAME
-====
+----
 
 tuit.list - list library
 
 SYNOPSIS
-========
+--------
 
      m = require "tuit.list"
      r = m.equal({1, 2, {3}}, {1, 2, {3}}) -- true
 
 
 DESCRIPTION
-===========
+-----------
 
 This module provides linear list functions.
 Some have a similar one in tuit.array' module,
@@ -51,10 +54,11 @@ but the order of the arguments may be different.
 
 --]]--
 ---tap
--- m = eval[[require 'tuit.list']] or skip_all()
+-- m = assert(require 'tuit.list')
+-- plan()
 --[[--
-constructors
-------------
+
+### constructors ###
 
 * `m.list(obj1, obj2, ...)` - returns a newly allocated list of its arguments.
 --]]--
@@ -116,8 +120,7 @@ end
 
 --[[--
 
-`fold` and other acumulator functions
--------------------------------------
+### `fold` and other acumulator functions ###
 
 * `m.fold_left(proc, init. lst1, ...)` - iterates function `proc` over an acumulator value and the elements of lists `lst1`, ... from left to right, starting with an acumulator value `init`. If `lst` is empty, it returns `init`.
 --]]--
@@ -180,8 +183,7 @@ end
 
 --[[--
 
-map, filter, and selectors
---------------------------
+### `map`, `filter`, and selectors ###
 
 * `m.map(proc, lst1, lst2, ...)` - applies `proc` element-wise to the elements of the lists in order and returns a list of the results.
 --]]--
@@ -273,7 +275,6 @@ function M.find(x, lst)
    return false
 end
 --[[--
-
 * `m.take(lst, i)` - returns a list of the first `i` elements of list `lst`.
 --]]--
 ---tap
@@ -302,7 +303,6 @@ function M.drop(lst, i)
 end
 
 --[[--
-
 * `m.erase(pred_or_elt, lst)` - deletes all the elements in list `lst` that are equivalent to or satisfy the first argument.
 
 --]]--
@@ -383,8 +383,7 @@ end
 
 --[[--
 
-miscellaneous
--------------
+### miscellaneous ###
 
 * `m.equal(x, y)` - returns `true` if and only if `a` and `b` are recursively
 equivalent.
@@ -408,7 +407,6 @@ function M.equal(a, b)
    end
 end
 --[[--
-
 * `m.apply(proc, lst)` applies procedure `proc` to a list of arguments `lst`.
 --]]--
 ---tap
@@ -621,7 +619,7 @@ end
 --[[--
 
 AUTHOR
-======
+------
 
 TAGA Yoshitaka
 

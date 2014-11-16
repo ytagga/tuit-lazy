@@ -2,28 +2,30 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title>NAME</title>
+	<title>../tuit/combine.lua</title>
 	<link rel="stylesheet" type="text/css" href="default.css" />
 </head>
 <body>
 
 
-<h1>NAME</h1>
+<h1>tuit.combine</h1>
+
+<h2>NAME</h2>
 
 <p>tuit.combine - functions for functional programming</p>
 
-<h1>SYNOPSIS</h1>
+<h2>SYNOPSIS</h2>
 
 <pre><code> m = require "tuit.combine"
  print(m.fix(function () return m.const(9) end)(3)) -- 9
 </code></pre>
 
-<h1>DESCRIPTION</h1>
+<h2>DESCRIPTION</h2>
 
 <p>This module provides utility functions for functional programming.</p>
 
 
-<h2>high-order functions</h2>
+<h3>high-order functions</h3>
 
 <ul>
     <li><code>m.comp(f1, f2, ..., fn)</code> - composition <br/>
@@ -42,7 +44,7 @@
     This function makes a memoized version of function <code>f</code>.</li>
 </ul>
 
-<h2>combinators</h2>
+<h3>combinators</h3>
 
 <ul>
     <li><code>m.fix(f)</code> -- fix point combinator <br/>
@@ -54,7 +56,7 @@
     This function returns a function which always returns <code>x</code>.</li>
 </ul>
 
-<h2>utility functions</h2>
+<h3>utility functions</h3>
 
 <ul>
     <li><code>m.null(x)</code> -  null? <br/>
@@ -63,7 +65,7 @@
     This function returns the argument itself.</li>
 </ul>
 
-<h2>wrappers of Lua operators</h2>
+<h3>wrappers of Lua operators</h3>
 
 <ul>
     <li><code>m.add(x, y)</code> - <code>x + y</code></li>
@@ -84,7 +86,7 @@
     <li><code>m.call(f, ...)</code> - <code>f(...)</code></li>
 </ul>
 
-<h1>AUTHOR</h1>
+<h2>AUTHOR</h2>
 
 <p>TAGA Yoshitaka</p>
 

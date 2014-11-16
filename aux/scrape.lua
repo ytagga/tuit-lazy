@@ -36,7 +36,7 @@ Gather up comments from a Lua file
          --version    output version information and exit
 ]=]
 
--- doc() ------------------------------------------------
+-- doc ------------------------------------------------
 function doc()
    local sw = false
 
@@ -50,51 +50,9 @@ function doc()
       end
    end
 end
+-- tap ------------------------------------------------
 
--- tap() ------------------------------------------------
-local check_func_tab = {}
-
--- Chnage this table if you rewrite tuit/tap.lua! --
-for i, v in ipairs{'ok', 'is', 'isnt', 'like', 'unlike', 'isa', 'is_deeply'} do
-   check_func_tab[v] = i
-end
-
-local function has_check_func(line)
-   local v = string.match(line, "^%s*([%w_]+)")
-   return check_func_tab[v]
-end
-
-function tap()
-   local sw = false
-   local cnt = 0
-
-   print("--- tap script - -*- mode:lua -*-")
-   print('require "tuit.tap"')
-   print("local t = loadstring [=====[")
-   for line in io.lines() do
-      if string.match(line, "^%-%-%-tap") then
-	 sw = true
-      elseif not(string.match(line, "^%-%- ")) then
-	 sw = false
-      elseif sw then
-	 line = string.sub(line, 4)
-	 if has_check_func(line) then
-	    cnt = cnt + 1
-	 end
-	 print(line)
-      end
-   end
-   print("]=====]")
-   print("if t == nil then")
-   print('  skip_all("broken test script")')
-   print("end")
-   print("plan(" .. cnt .. ")")
-   print("local f, v = pcall(t)")
-   print("if not(f) then")
-   print("   bail_out(v)")
-   print("end")
-   print("os.exit(tuit.tap.not_ok)")
-end
+require "tuit.tap"
 
 -- main -------------------------------------------------
 if #argv > 0 then
@@ -103,6 +61,6 @@ end
 if argv.doc then
    doc()
 else
-   tap()
+   tuit.tap.make_script()
 end
 --- scrape.lua ends here
