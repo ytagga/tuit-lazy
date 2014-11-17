@@ -51,6 +51,9 @@ function M.bless(obj, idxf, tab)
       tab = idxf
       idxf = obj
       obj = M
+   elseif type(obj) == 'table' and obj.class == nil then
+      tab = obj
+      obj = M
    end
    tab = tab or {}
    if idxf then

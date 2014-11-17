@@ -45,6 +45,12 @@ function M.newindex(t, n, v) return v end
 -- is(x[1], 1)
 -- is(x[2], 2)
 -- is(x[1], 3)
+-- is_deeply(m.bless{1, 2, 3}:map(function (x) return x * 2 end):take(2), {2, 4})
+function M.bless(obj, idxf, tab)
+   local r = tuit.array.lazy.bless(obj, idxf, tab)
+   getmetatable(r).__newindex = M.newindex
+   return r
+end
 
 return M
 --- tuit/array/nonce.lua ends here
