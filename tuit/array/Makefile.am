@@ -4,7 +4,7 @@ LUA = LUA_PATH="$(top_srcdir)/?.lua;;" @LUA@
 
 tuitarraydir = $(datadir)/lua/$(LUA_VERSION)/@LUA_MODPATH@/array
 
-dist_tuitarray_DATA = lazy.lua nonce.lua
+dist_tuitarray_DATA = lazy.lua
 
 tests = $(dist_tuitarray_DATA:.lua=.t)
 

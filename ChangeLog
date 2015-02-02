@@ -1,3 +1,7 @@
+2015-02-02  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* tuit/array/nonce.lua: Removed
+
 2014-11-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* tuit/array/nonce.lua: Added

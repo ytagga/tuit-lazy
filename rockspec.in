@@ -6,8 +6,12 @@ source = {
    tag = "v@VERSION@"
 }
 description = {
-   summary = "iteration over a lazy-evaluated array",
+   summary = "lazy-evaluation over an array"
    detailed = [[
+tuit.array.lazy module enables lazy-evaluation over an array.
+This package also provides tuit.combine module
+which have some functions
+for cominatory programming and functional programming.
    ]],
   license = "ISC"
 }
@@ -18,7 +22,6 @@ build = {
    type = "builtin",
    modules = {
       ["tuit.array.lazy"] = "tuit/array/lazy.lua",
-      ["tuit.array.nonce"] = "tuit/array/nonce.lua",
       ["tuit.array"] = "tuit/array.lua",
       ["tuit.list"] = "tuit/list.lua"
       ["tuit.combine"] = "tuit/combine.lua",

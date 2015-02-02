@@ -2,7 +2,7 @@
 
 htmlfiles = index.html
 htmlfiles += tuit-array.html tuit-list.html tuit-combine.html
-htmlfiles += tuit-array-lazy.html tuit-array-nonce.html
+htmlfiles += tuit-array-lazy.html
 
 index.html : ../README.md
 	sed -e s!\(doc/!\(! $? | markdown.lua --title "README" > $@

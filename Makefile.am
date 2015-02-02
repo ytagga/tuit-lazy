@@ -19,6 +19,6 @@ clean-local :
 	-rm  $(PACKAGE)-$(VERSION)-$(RELEASE).rockspec
 
 check-local :
-	LUA_PATH="?.lua;;" $(LUA) $(top_srcdir)/aux/prove.lua tuit/*.t tuit/*/*.t
+	LUA_PATH="?.lua;;" $(LUA) $(top_srcdir)/aux/prove.lua -e $(LUA) tuit/*.t tuit/*/*.t
 
 # Makefile.am ends here

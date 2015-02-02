@@ -36,6 +36,33 @@ local M = tuit.array.lazy
 M.class = M
 M.newindex = nil
 
+--[[--
+
+tuit.array.lazy
+===============
+
+NAME
+----
+
+tuit.array.lazy - iteration over a lazy-evaluated array
+
+SYNOPSIS
+--------
+
+     M = require "tuit.array.lazy"
+     return M.unfold(
+              function (x) return false end,
+              function (x) return x[#x] + x[#x-1] end,
+              function (x) return x end,
+              {1, 1}):take(5) -- {1, 1, 2, 3, 5}
+
+DESCRIPTION
+-----------
+
+This module overwrites some iteration functions in `tuit.array`
+and adds the lazy-evalution functionality to them.
+
+--]]--
 ---tap
 -- m = assert(require 'tuit.array.lazy')
 -- plan()
@@ -129,8 +156,6 @@ local function unfold_indexer(pred, kar, kdr, seed, head)
 	  end, head
 end
 
---[[--
---]]--
 ---tap
 -- is_deeply(m.unfold(
 --             function (x) return false end,
@@ -143,6 +168,11 @@ function M.unfold(pred, kar, kdr, seed, head)
    return M.bless(unfold_indexer(pred, kar, kdr, seed, head))
 end
 --[[--
+
+Constructors
+------------
+* `m.unfold([null], kar, [kdr, seed, head]) - is a generic recursive constructor.
+The default values of `seed` is `{}`, that of `head` is `seed` or `{}`, that of `kdr` is the identity function, and that of `null` is a constant function that returns `false`.
 --]]--
 ---tap
 -- is_deeply(m.range(1, math.huge):take(5), {1, 2, 3, 4, 5})
@@ -165,6 +195,8 @@ function M.range(init, finish, step)
 		end)
 end
 --[[--
+* m.range(init, finish, [step]) - returns an array beginning with `init` and ending with `finish`, stepping up or down by `step`.
+`finish` can be `math.huge`.
 --]]--
 ---tap
 -- is_deeply(m.range(1, math.huge):map(function (x) return x * 2 end):take(5), {2, 4, 6, 8, 10})
